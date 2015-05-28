@@ -30,15 +30,15 @@ def train_MVA(bkgTree, sigTree, discriList, MVAmethod,label):
     factory.AddSignalTree(tree_proc2, proc2_weight)
 
     if MVAmethod == "BDT" :
-        method = factory.BookMethod(ROOT.TMVA.Types.kBDT, "BDT800_"+label, "!H:!V:NTrees=800")
+        method = factory.BookMethod(ROOT.TMVA.Types.kBDT, "800_"+label, "!H:!V:NTrees=800")
     elif MVAmethod == "MLP" :
-        method = factory.BookMethod(ROOT.TMVA.Types.kMLP, "MLP_"+label, "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5")
+        method = factory.BookMethod(ROOT.TMVA.Types.kMLP, "Nplus5_"+label, "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5")
     elif MVAmethod == "CUT" :
-        method = factory.BookMethod(ROOT.TMVA.Types.kCuts, "Cuts_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
+        method = factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
     elif MVAmethod == "ALL" :
-        factory.BookMethod(ROOT.TMVA.Types.kBDT, "BDT_"+label, "!H:!V:NTrees=800")
-        factory.BookMethod(ROOT.TMVA.Types.kMLP, "MLP_"+label, "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5")
-        factory.BookMethod(ROOT.TMVA.Types.kCuts, "Cuts_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
+        factory.BookMethod(ROOT.TMVA.Types.kBDT, "800_"+label, "!H:!V:NTrees=800")
+        factory.BookMethod(ROOT.TMVA.Types.kMLP, "Nplus5_"+label, "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5")
+        factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
     else :
         print "MVA method must be BDT, MLP, CUT or ALL."
         sys.exit()
