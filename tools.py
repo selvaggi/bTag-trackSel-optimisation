@@ -51,13 +51,13 @@ def plotFromCrabOut(rootFile, treeDirectory, TrackVars, JetVars,  doPTreweight, 
                 nBkgJet+=1
                 for var in JetVars :
                     dict_histo_jet_bkg[var].Fill(getattr(tree,JetVars[var]["name"])[jetInd])
-                    for track in xrange(tree.Jet_nFirstTrack[jetInd],tree.Jet_nLastTrack[jetInd]):
-                        if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track],tree.Track_IP2D[track],tree.Track_pt[track],tree.Track_chi2[track],tree.Track_zIP[track],tree.Track_length[track],tree.Track_dist[track]): 
-                            for var in TrackVars.keys() :
-                                dict_histo_track_bkg[var].Fill(getattr(tree,TrackVars[var]["name"])[track])
+                for track in xrange(tree.Jet_nFirstTrack[jetInd],tree.Jet_nLastTrack[jetInd]):
+                    if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track],tree.Track_IP2D[track],tree.Track_pt[track],tree.Track_chi2[track],tree.Track_zIP[track],tree.Track_length[track],tree.Track_dist[track]): 
+                        for var in TrackVars.keys() :
+                            dict_histo_track_bkg[var].Fill(getattr(tree,TrackVars[var]["name"])[track])
     print "NsigJet : ", nSigJet, " N bkg jet : ", nBkgJet
     if doPTreweight : 
-        print "Start pt reweighting to match pt spectrum in both signal and bkg jets."
+        print "Start pt reweighting so that pt spectrum in bkg matches the one of the signal."
         jetPt_ptRew2 = ROOT.TH1D("jetPt_ptRew2","jetPt_ptRew2",JetVars["Jet_pt"]["bin"],JetVars["Jet_pt"]["xmin"],JetVars["Jet_pt"]["xmax"])
         dict_histo_track_ptRew_bkg = {var:ROOT.TH1D(var+"2_ptRew",var+"2_ptRew",TrackVars[var]["bin"],TrackVars[var]["xmin"],TrackVars[var]["xmax"]) for var in TrackVars}
         ratio = copy.copy(dict_histo_jet_signal["Jet_pt"])
