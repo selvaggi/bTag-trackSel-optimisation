@@ -1,5 +1,7 @@
 # bTag-trackSel-optimisation
 
+Requires python >= 2.7
+
 ##Files explanation
 
     tools.py : tools to create rootFile and make the plot from the crab output (decided to keep this possibility because easier to reweight according to Jet pt). This is the file to edit in order to change the selection of the jets/tracks.
