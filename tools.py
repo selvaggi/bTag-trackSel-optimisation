@@ -15,7 +15,7 @@ def isSignalJet(jetGenPT, jetFlavour):
 def isBkgJet(jetGenPT, jetFlavour):
 	return jetGenPT<8 
 
-def plotFromCrabOut(rootFile, treeDirectory, TrackVars, JetVars,  doPTreweight, outRootFileName):
+def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight, outRootFileName):
     
     yAxisLabel = "Arbitrary Scale"
     leftText = "Phys14 QCD30-50 MuEnriched #sqrt{s}=13 TeV"
@@ -25,8 +25,10 @@ def plotFromCrabOut(rootFile, treeDirectory, TrackVars, JetVars,  doPTreweight, 
 
     ROOT.gROOT.SetBatch()
     # ouvre le rootfile, selectionne signal jet --> signal tracks, bkg jet --> bkg track, plot les variables dans TrackVars 
-    file = ROOT.TFile(rootFile, "read")
-    tree = file.Get(treeDirectory)
+    tree = ROOT.TChain(treeDirectory)
+    for file in rootFiles:
+        tree.Add(file)
+    
     nEntries = tree.GetEntries()
     nSigJet = 0
     nBkgJet = 0
@@ -157,12 +159,13 @@ def plotFromCrabOut(rootFile, treeDirectory, TrackVars, JetVars,  doPTreweight, 
 		
     outRootFile.Close()
 
-def createTreeSigBkg(rootFile, treeDirectory, trackVariablesToStore, outRootFileName_sig, outRootFileName_bkg) :
+def createTreeSigBkg(rootFiles, treeDirectory, trackVariablesToStore, outRootFileName_sig, outRootFileName_bkg) :
     # ouvre le rootfile, selectionne signal jet --> signal tracks, bkg jet --> bkg track , train MVA, donne une fonction
     # file = ROOT.TFile(rootFile, "read")
 
     tree = ROOT.TChain(treeDirectory)
-    tree.Add(rootFile)
+    for file in rootFiles:
+        tree.Add(file)
 
     sigTree = ROOT.TTree("trackTree","sigTrackTree")
     bkgTree = ROOT.TTree("trackTree","bkgTrackTree")

@@ -1,7 +1,8 @@
 from tools import *
+import os
 
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
-rootFileName = "JetTree_phys14_1.root"
+rootFileNames = ["JetTree_phys14_1.root"]
 treeDirectory = "btagana/ttree"
 trackSelection = "bTag"    #"bTagLoosened", "no", "dist", "bTag"
 
@@ -29,4 +30,5 @@ TrackVars = {
 }
 
 if __name__ == "__main__" :
-    createTreeSigBkg(storeDirectory+rootFileName, treeDirectory, TrackVars.keys(), "sigTrackTree_"+trackSelection+"TrackSel.root", "bkgTrackTree_"+trackSelection+"TrackSel.root")
+    fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
+    createTreeSigBkg(fileList, treeDirectory, TrackVars.keys(), "sigTrackTree_"+trackSelection+"noTrackSel.root", "bkgTrackTree_"+trackSelection+"noTrackSel.root")
