@@ -5,14 +5,9 @@ from array import array
 
 def isSelectedTrack(HitPix=2, HitAll=8, IP2D=0.2, Pt=1, Chi2=5, ZIP=17, Length=50, Dist=0.07):  #default values are the value requested for selectedTrack in bTag code
 	return HitPix >= 2 and HitAll>=8 and IP2D<0.2 and Pt>1 and Chi2 < 5 and ZIP < 17 and Length <50 and Dist < 0.07  # bTag current selection
-	#return HitPix >= 1 and HitAll>=6 and IP2D<0.3 and Pt>0.5 and Chi2 < 7 and ZIP < 20 and Length <60 and Dist < 0.1
-	#return True  
-
-def isSelectedTrack_forTree(ZIP=17, Dist=0.07):  #default values are the value requested for selectedTrack in bTag code
-	#return HitPix >= 2 and HitAll>=8 and IP2D<0.2 and Pt>1 and Chi2 < 5 and ZIP < 17 and Length <50 and Dist < 0.07
-	#return HitPix >= 1 and HitAll>=6 and IP2D<0.3 and Pt>0.5 and Chi2 < 7 and ZIP < 20 and Length <60 and Dist < 0.1
-	return  ZIP < 17 and Dist < 0.07 
-    #return True
+	#return HitPix >= 1 and HitAll>=6 and IP2D<0.3 and Pt>0.5 and Chi2 < 7 and ZIP < 20 and Length <60 and Dist < 0.1 # Looser selection
+	#return ZIP < 17 and Dist < 0.07    # Selection applied only on the "Jet vs track" variable
+	#return True # no selection 
 
 def isSignalJet(jetGenPT, jetFlavour):
 	return jetGenPT>8 and abs(jetFlavour)==5
@@ -162,7 +157,7 @@ def plotFromCrabOut(rootFile, treeDirectory, TrackVars, JetVars,  doPTreweight, 
 
 def createTreeSigBkg(rootFile, treeDirectory, trackVariablesToStore, outRootFileName_sig, outRootFileName_bkg) :
     # ouvre le rootfile, selectionne signal jet --> signal tracks, bkg jet --> bkg track , train MVA, donne une fonction
-    #file = ROOT.TFile(rootFile, "read")
+    # file = ROOT.TFile(rootFile, "read")
 
     tree = ROOT.TChain(treeDirectory)
     tree.Add(rootFile)
@@ -190,17 +185,14 @@ def createTreeSigBkg(rootFile, treeDirectory, trackVariablesToStore, outRootFile
                 for track in xrange(tree.Jet_nFirstTrack[jetInd],tree.Jet_nLastTrack[jetInd]):
                     nSigTrack_beforeSel += 1
                     if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track],tree.Track_IP2D[track],tree.Track_pt[track],tree.Track_chi2[track],tree.Track_zIP[track],tree.Track_length[track],tree.Track_dist[track]):
-                    #if isSelectedTrack_forTree(tree.Track_zIP[track],tree.Track_dist[track]):
                         nSigTrack_afterSel += 1
                         for variable in dict_variableName_listArrayLeaves.keys() :
                             dict_variableName_listArrayLeaves[variable][0][0] = getattr(tree, variable)[track]
                         sigTree.Fill()
             if isBkgJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
-                for track in xrange(tree.Jet_nFirstTrack[jetInd],tree.Jet_nLastTrack[jetInd]):
+                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     nBkgTrack_beforeSel += 1
-                    #if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track],tree.Track_IP2D[track],tree.Track_pt[track],tree.Track_chi2[track],tree.Track_zIP[track],tree.Track_length[track],tree.Track_dist[track]):
-                    #if isSelectedTrack_forTree(tree.Track_zIP[track],tree.Track_dist[track]):
-                    if True :
+                    if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track],tree.Track_IP2D[track],tree.Track_pt[track],tree.Track_chi2[track],tree.Track_zIP[track],tree.Track_length[track],tree.Track_dist[track]):
                         nBkgTrack_afterSel += 1
                         for variable in dict_variableName_listArrayLeaves.keys() :
                             dict_variableName_listArrayLeaves[variable][0][0] = getattr(tree, variable)[track]
