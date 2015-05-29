@@ -32,7 +32,7 @@ def train_MVA(bkgTree, sigTree, discriList, MVAmethod,label):
     if MVAmethod == "BDT" :
         method = factory.BookMethod(ROOT.TMVA.Types.kBDT, "800_"+label, "!H:!V:NTrees=800")
     elif MVAmethod == "MLP" :
-        method = factory.BookMethod(ROOT.TMVA.Types.kMLP, "Nplus5_"+label, "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5")
+        method = factory.BookMethod(ROOT.TMVA.Types.kMLP, "N_Nmin1_"+label, "H:V:VarTransform=Norm:NCycles=3000:HiddenLayers=N,N-1:TestRate=10")
     elif MVAmethod == "CUT" :
         method = factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
     elif MVAmethod == "ALL" :
