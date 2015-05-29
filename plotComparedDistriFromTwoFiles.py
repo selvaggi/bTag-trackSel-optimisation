@@ -58,14 +58,14 @@ tree2 = rootFile2.Get(treeName)
 outRootFile = TFile(outFile,"recreate")
 
 for entry in xrange(tree1.GetEntries()) :
-	tree1.GetEntry(entry)
-	for var in Vars.keys() :
-	    dict_histo1[var].Fill(getattr(tree1,Vars[var]["name"]))
+    tree1.GetEntry(entry)
+    for var in Vars.keys() :
+        dict_histo1[var].Fill(getattr(tree1,Vars[var]["name"]))
 
 for entry in xrange(tree2.GetEntries()) :
-	tree2.GetEntry(entry)
-	for var in Vars.keys() :
-		dict_histo2[var].Fill(getattr(tree2,Vars[var]["name"]))
+    tree2.GetEntry(entry)
+    for var in Vars.keys() :
+        dict_histo2[var].Fill(getattr(tree2,Vars[var]["name"]))
 
 
 for var in Vars.keys() : 

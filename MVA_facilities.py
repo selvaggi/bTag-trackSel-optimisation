@@ -50,7 +50,7 @@ def train_MVA(bkgTree, sigTree, discriList, MVAmethod,label):
 
 def evaluate_BDT(bkgTree,sigTree,discri1,discri2,label):     # TO BE FIXED (from an old code) 
 
-	file_proc1 = ROOT.TFile(bkgTree)    
+file_proc1 = ROOT.TFile(bkgTree)    
         file_proc2 = ROOT.TFile(sigTree)    
 
         tree_proc2=file_proc2.Get("Event")
@@ -64,86 +64,86 @@ def evaluate_BDT(bkgTree,sigTree,discri1,discri2,label):     # TO BE FIXED (from
         file_BDT = ROOT.TFile("/home/fynu/bfrancois/storage/doc/MIS/firstTryDelphes/trunk/BDTout_"+label+".root","recreate")
 
 
-	reader = ROOT.TMVA.Reader()
-	
-	var_discri1 = array('f',[0]) 
-	reader.AddVariable(discri1,var_discri1)
-	var_discri2 = array('f',[0]) 
-	reader.AddVariable(discri2,var_discri2)
+reader = ROOT.TMVA.Reader()
 
-	reader.BookMVA("BDT800_"+label,"weights/BDT_BDT800_"+label+".weights.xml")	
+var_discri1 = array('f',[0]) 
+reader.AddVariable(discri1,var_discri1)
+var_discri2 = array('f',[0]) 
+reader.AddVariable(discri2,var_discri2)
 
-	histo_proc1_BDT800_out=ROOT.TH1F("histo_proc1_BDT800_out","histo_proc1_BDT800_out",100,-1,1)
-	histo_proc2_BDT800_out=ROOT.TH1F("histo_proc2_BDT800_out","histo_proc2_BDT800_out",100,-1,1)
-	histo_proc2_BDT800_out.SetLineColor(ROOT.kRed)
+reader.BookMVA("BDT800_"+label,"weights/BDT_BDT800_"+label+".weights.xml")    
+
+histo_proc1_BDT800_out=ROOT.TH1F("histo_proc1_BDT800_out","histo_proc1_BDT800_out",100,-1,1)
+histo_proc2_BDT800_out=ROOT.TH1F("histo_proc2_BDT800_out","histo_proc2_BDT800_out",100,-1,1)
+histo_proc2_BDT800_out.SetLineColor(ROOT.kRed)
  
-	for entry in xrange(tree_proc1.GetEntries()):
-		tree_proc1.GetEntry(entry)
-		var_discri1[0] = getattr(tree_proc1,discri1)
-		var_discri2[0] = getattr(tree_proc1,discri2)
-		histo_proc1_BDT800_out.Fill(reader.EvaluateMVA("BDT800_"+label))
-		
+for entry in xrange(tree_proc1.GetEntries()):
+    tree_proc1.GetEntry(entry)
+    var_discri1[0] = getattr(tree_proc1,discri1)
+    var_discri2[0] = getattr(tree_proc1,discri2)
+    histo_proc1_BDT800_out.Fill(reader.EvaluateMVA("BDT800_"+label))
+    
 
-	for entry in xrange(tree_proc2.GetEntries()):
-		tree_proc2.GetEntry(entry)
-		var_discri1[0]= getattr(tree_proc2,discri1)
-		var_discri2[0]= getattr(tree_proc2,discri2)
-		histo_proc2_BDT800_out.Fill(reader.EvaluateMVA("BDT800_"+label))
-	
-	legend = ROOT.TLegend(0.61,0.67,0.76,0.82)
-	legend.AddEntry(histo_proc1_BDT800_out,"Proc1")
-	legend.AddEntry(histo_proc2_BDT800_out,"Proc2") #rightarrow WWbb");
-	legend.SetFillColor(0)
-	legend.SetLineColor(0)
+for entry in xrange(tree_proc2.GetEntries()):
+    tree_proc2.GetEntry(entry)
+    var_discri1[0]= getattr(tree_proc2,discri1)
+    var_discri2[0]= getattr(tree_proc2,discri2)
+    histo_proc2_BDT800_out.Fill(reader.EvaluateMVA("BDT800_"+label))
+
+legend = ROOT.TLegend(0.61,0.67,0.76,0.82)
+legend.AddEntry(histo_proc1_BDT800_out,"Proc1")
+legend.AddEntry(histo_proc2_BDT800_out,"Proc2") #rightarrow WWbb");
+legend.SetFillColor(0)
+legend.SetLineColor(0)
 
 
 
-	canvasName = "BDTout"
-	xlabel = "BDT output"                      #"HH efficiency"
-	ylabel = "Arbitrary Scale"   #"t#bar{t} efficiency"
-	leftText = "First Try for a MIS (Delphes), #sqrt{s}=14 TeV, NoPU"
-	rightText = "WW #rightarrow l#nul#nu"
-	format="png"
-	directory = "../images/BDT/"
+canvasName = "BDTout"
+xlabel = "BDT output"                      #"HH efficiency"
+ylabel = "Arbitrary Scale"   #"t#bar{t} efficiency"
+leftText = "First Try for a MIS (Delphes), #sqrt{s}=14 TeV, NoPU"
+rightText = "WW #rightarrow l#nul#nu"
+format="png"
+directory = "../images/BDT/"
 
-	drawDoublehisto(histo_proc1_BDT800_out,histo_proc2_BDT800_out,canvasName,xlabel,ylabel,legend,leftText,rightText,format,directory,0)
+drawDoublehisto(histo_proc1_BDT800_out,histo_proc2_BDT800_out,canvasName,xlabel,ylabel,legend,leftText,rightText,format,directory,0)
 
 
 def MVA_out_in_tree(files,discri1,discri2,label):   # TO BE FIXED
 # NB files is a list of TFile without the .root extension
 
-	for file in files:
-		print "Input file : ",file+".root"
-		
-		file_in = ROOT.TFile(file+".root","read")
-		file_withBDTout = ROOT.TFile(file+"_withBDTout_"+label+".root","recreate")
-		
-		tree_in = file_in.Get("Event")
-		tree_withBDTout = tree_in.CloneTree(0)
-		print "Number of input tree entries : ",tree_in.GetEntries()
-		
-		leave_BDTout="BDTout_"+label+"/D"
-		BDT_out=array('d',[0])
-		tree_withBDTout.Branch("BDTout_"+label,BDT_out,leave_BDTout)	
+for file in files:
+    print "Input file : ",file+".root"
+    
+    file_in = ROOT.TFile(file+".root","read")
+    file_withBDTout = ROOT.TFile(file+"_withBDTout_"+label+".root","recreate")
+    
+    tree_in = file_in.Get("Event")
+    tree_withBDTout = tree_in.CloneTree(0)
+    print "Number of input tree entries : ",tree_in.GetEntries()
+    
+    leave_BDTout="BDTout_"+label+"/D"
+    BDT_out=array('d',[0])
+    tree_withBDTout.Branch("BDTout_"+label,BDT_out,leave_BDTout)    
 
-		reader = ROOT.TMVA.Reader()
+    reader = ROOT.TMVA.Reader()
 
-		var_discri1 = array('f',[0])
-		reader.AddVariable(discri1,var_discri1)
-		var_discri2 = array('f',[0])
-		reader.AddVariable(discri2,var_discri2)
+    var_discri1 = array('f',[0])
+    reader.AddVariable(discri1,var_discri1)
+    var_discri2 = array('f',[0])
+    reader.AddVariable(discri2,var_discri2)
 
-		reader.BookMVA("BDT800_"+label,"weights/BDT_BDT800_"+label+".weights.xml")
+    reader.BookMVA("BDT800_"+label,"weights/BDT_BDT800_"+label+".weights.xml")
 
-		for entry in xrange(tree_in.GetEntries()):
-			tree_in.GetEntry(entry)
-			var_discri1[0] = getattr(tree_in,discri1)
-			var_discri2[0] = getattr(tree_in,discri2)
-			BDT_out[0]=reader.EvaluateMVA("BDT800_"+label)
-			tree_withBDTout.Fill()
-		print "Number of output tree entries : ",tree_withBDTout.GetEntries()
-		tree_withBDTout.Write()
-		file_withBDTout.Close()
-		file_in.Close()
-		print "Output file : ",file+"_withBDTout_"+label+".root", " written."
+    for entry in xrange(tree_in.GetEntries()):
+        tree_in.GetEntry(entry)
+        var_discri1[0] = getattr(tree_in,discri1)
+        var_discri2[0] = getattr(tree_in,discri2)
+        BDT_out[0]=reader.EvaluateMVA("BDT800_"+label)
+        tree_withBDTout.Fill()
+    print "Number of output tree entries : ",tree_withBDTout.GetEntries()
+    tree_withBDTout.Write()
+    file_withBDTout.Close()
+    file_in.Close()
+    print "Output file : ",file+"_withBDTout_"+label+".root", " written."
 
