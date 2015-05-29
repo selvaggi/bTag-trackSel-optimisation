@@ -34,7 +34,7 @@ def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight,
     nBkgJet = 0
     
     dict_histo_track_signal = { var: ROOT.TH1D(var+"1", var+"1", TrackVars[var]["bin"], TrackVars[var]["xmin"], TrackVars[var]["xmax"]) for var in TrackVars }
-    dict_histo_track_bkg = { var :ROOT.TH1D(var+"2", var+"2", TrackVars[var]["bin"], TrackVars[var]["xmin"], TrackVars[var]["xmax"]) for var in TrackVars }
+    dict_histo_track_bkg = { var: ROOT.TH1D(var+"2", var+"2", TrackVars[var]["bin"], TrackVars[var]["xmin"], TrackVars[var]["xmax"]) for var in TrackVars }
     dict_histo_jet_signal = { var: ROOT.TH1D(var+"1", var+"1", JetVars[var]["bin"], JetVars[var]["xmin"], JetVars[var]["xmax"]) for var in JetVars }
     dict_histo_jet_bkg = { var: ROOT.TH1D(var+"2", var+"2", JetVars[var]["bin"], JetVars[var]["xmin"], JetVars[var]["xmax"]) for var in JetVars }
 
@@ -51,7 +51,7 @@ def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight,
                 for var in JetVars :
                     dict_histo_jet_signal[var].Fill(getattr(tree, JetVars[var]["name"])[jetInd])
                 
-                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd] + 1):
+                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_zIP[track], tree.Track_length[track], tree.Track_dist[track]):
                         for var in TrackVars :
                             dict_histo_track_signal[var].Fill(getattr(tree, TrackVars[var]["name"])[track])
@@ -62,7 +62,7 @@ def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight,
                 for var in JetVars :
                     dict_histo_jet_bkg[var].Fill(getattr(tree, JetVars[var]["name"])[jetInd])
                 
-                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd] + 1):
+                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_zIP[track], tree.Track_length[track], tree.Track_dist[track]): 
                         for var in TrackVars.keys() :
                             dict_histo_track_bkg[var].Fill(getattr(tree, TrackVars[var]["name"])[track])
@@ -86,7 +86,7 @@ def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight,
                 if isBkgJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
                     ptWeight = ratio.GetBinContent(ratio.FindBin(tree.Jet_pt[jetInd])) 
                     jetPt_ptRew2.Fill(tree.Jet_pt[jetInd], ptWeight)
-                    for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]i + 1):
+                    for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                         if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_zIP[track], tree.Track_length[track], tree.Track_dist[track]): 
                             for var in TrackVars.keys() :
                                 dict_histo_track_ptRew_bkg[var].Fill(getattr(tree, TrackVars[var]["name"])[track], ptWeight)
@@ -201,21 +201,21 @@ def createTreeSigBkg(rootFiles, treeDirectory, trackVariablesToStore, outRootFil
         for jetInd in xrange(tree.nJet):
             
             if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
-                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd] + 1):
+                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     nSigTrack_beforeSel += 1
                     if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_zIP[track], tree.Track_length[track], tree.Track_dist[track]):
                         nSigTrack_afterSel += 1
-                        for variable in dict_variableName_listArrayLeaves.keys() :
-                            dict_variableName_listArrayLeaves[variable][0][0] = getattr(tree, variable)[track]
+                        for variable in dict_variableName_Leaves.keys() :
+                            dict_variableName_Leaves[variable][0] = getattr(tree, variable)[track]
                         sigTree.Fill()
             
             if isBkgJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
-                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]i + 1):
+                for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     nBkgTrack_beforeSel += 1
                     if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_zIP[track], tree.Track_length[track], tree.Track_dist[track]):
                         nBkgTrack_afterSel += 1
-                        for variable in dict_variableName_listArrayLeaves.keys() :
-                            dict_variableName_listArrayLeaves[variable][0][0] = getattr(tree, variable)[track]
+                        for variable in dict_variableName_Leaves.keys() :
+                            dict_variableName_Leaves[variable][0] = getattr(tree, variable)[track]
                         bkgTree.Fill()
    
     print "Signal:     {} track selection efficiency.".format(nSigTrack_afterSel/float(nSigTrack_beforeSel))

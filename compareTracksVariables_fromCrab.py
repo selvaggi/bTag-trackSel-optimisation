@@ -41,6 +41,6 @@ JetVars = {
  }
 
 if __name__ == "__main__" : 
-    fileList = [ os.path.join(storeDirectory, file for file in rootFileNames ]
+    fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
     plotFromCrabOut(fileList, treeDirectory, TrackVars, JetVars, doPTreweight, outRootFileName)
 
