@@ -6,7 +6,7 @@ from array import array
 def isSelectedTrack(HitPix=2, HitAll=8, IP2D=0.2, Pt=1, Chi2=5, ZIP=17, Length=50, Dist=0.07):  #default values are the value requested for selectedTrack in bTag code
 	return HitPix >= 2 and HitAll>=8 and IP2D<0.2 and Pt>1 and Chi2 < 5 and ZIP < 17 and Length <50 and Dist < 0.07  # bTag current selection
 	#return HitPix >= 1 and HitAll>=6 and IP2D<0.3 and Pt>0.5 and Chi2 < 7 and ZIP < 20 and Length <60 and Dist < 0.1 # Looser selection
-	#return ZIP < 17 and Dist < 0.07    # Selection applied only on the "Jet vs track" variable
+	#return Dist < 0.07    # Selection applied only on the "Jet vs track" variable
 	#return True # no selection 
 
 def isSignalJet(jetGenPT, jetFlavour):
