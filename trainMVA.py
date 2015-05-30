@@ -18,7 +18,7 @@ TrackVars = [
 
 trackSel =  "bTag"   #"no" , "bTag", "bTagLoosened", "dist"
 
-train_MVA("./bkgTrackTree_"+trackSel+"TrackSel.root", "./sigTrackTree_"+trackSel+"TrackSel.root", TrackVars, "MLP", trackSel+"Sel")
+train_MVA("./bkgTrackTree_"+trackSel+"TrackSel.root", "./sigTrackTree_"+trackSel+"TrackSel.root", TrackVars, "MLP", trackSel+"Sel_N_Nmin1")
 
 
 

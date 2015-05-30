@@ -37,7 +37,7 @@ def train_MVA(bkgTree, sigTree, discriList, MVAmethod,label):
         method = factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
     elif MVAmethod == "ALL" :
         factory.BookMethod(ROOT.TMVA.Types.kBDT, "800_"+label, "!H:!V:NTrees=800")
-        factory.BookMethod(ROOT.TMVA.Types.kMLP, "Nplus5_"+label, "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+5:TestRate=5")
+        factory.BookMethod(ROOT.TMVA.Types.kMLP, "N_Nmin1_"+label, "H:V:VarTransform=Norm:NCycles=3000:HiddenLayers=N,N-1:TestRate=10")
         factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
     else :
         print "MVA method must be BDT, MLP, CUT or ALL."
