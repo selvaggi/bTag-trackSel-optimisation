@@ -1,6 +1,6 @@
 import os
 from trackCounting import gt, geq, lt, leq, eq, neq
-from trackCounting import produceTaggedJetTree
+from trackCounting import createJetTreeTC
 
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
 rootFileNames = ["JetTree_phys14_1.root"]
@@ -41,4 +41,4 @@ trackMVA = {
 
 if __name__ == "__main__":
     fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
-    produceTaggedJetTree(fileList, treeDirectory, outFile, trackCut=trackCut, trackMVA=trackMVA)
+    createJetTreeTC(fileList, treeDirectory, outFile, trackCut=trackCut, trackMVA=trackMVA)

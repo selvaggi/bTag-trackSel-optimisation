@@ -11,6 +11,8 @@ def eq(l, r): return l == r
 def neq(l, r): return l != r
 
 class trackCutSelector:
+    """ Using the BTagAnalyzer tree and track number, check whether track passes cuts or not. """
+
     def __init__(self, cuts):
         self.cuts = cuts
 
@@ -22,6 +24,8 @@ class trackCutSelector:
         return True
 
 class trackMVASelector:
+    """ Using the BTagAnalyzer tree and track number, check whether track is selected by MVA or not. """
+    
     def __init__(self, path, name, cut, trackVars):
         self.name = name
         self.path = path
@@ -46,7 +50,11 @@ class trackMVASelector:
 
 
 
-def produceTaggedJetTree(rootFiles, treeDirectory, outFileName, trackCut=None, trackMVA=None):
+def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackMVA=None):
+    """ Create TTree containing info about the jets.
+    The tracks in the jets are selected either using cuts, or a MVA, or both.
+    Only jets with at least one track are kept.
+    For each jet, the number of selected tracks, and the jet IPsig, TCHE, and TCHP values are stored."""
 
     tree = ROOT.TChain(treeDirectory)
     for file in rootFiles:
