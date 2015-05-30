@@ -1,7 +1,13 @@
 import ROOT
 from array import array
 import os
-import sys 
+import sys
+import warnings
+
+# This is needed because using TTreeFormula::EvalInstance() produces a Python warning,
+# while everything runs absolutely fine.
+# See https://root.cern.ch/phpBB3/viewtopic.php?f=14&t=14213
+warnings.filterwarnings(action='ignore', category=RuntimeWarning, message='creating converter.*')
 
 def gt(l, r): return l > r
 def geq(l, r): return l >= r
@@ -144,3 +150,47 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
     outFile.cd()
     outTree.Write()
     outFile.Close()
+
+
+def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetCutList):
+    """ Using the tree output by createJetTreeTC, create histograms of the variables defined in histList.
+    A separate histogram is created on the jet of jets defined by each cut in jetCutList.
+    The histograms are then saved in outputFileName, in different folders. """
+
+    tree = ROOT.TChain(treeDirectory)
+    for file in inputFileList:
+        if not os.path.isfile(file):
+            print "Error: file {} does not exist.".format(file)
+            sys.exit(1)
+        tree.Add(file)
+
+    outFile = ROOT.TFile(outputFileName, "recreate")
+
+    # Define the cut selection formulae
+    for cut in jetCutList:
+        cut["formula"] = ROOT.TTreeFormula(cut["name"], cut["cuts"], tree)
+        tree.SetNotify(cut["formula"])
+        outFile.mkdir(cut["name"])
+
+    # For each histogram of histList, and for each cut of jetCutList, define a TH1
+    for histDict in histList:
+        histDict["cutDict"] = { cut["name"]: ROOT.TH1D(cut["name"] + "_" + histDict["name"], histDict["title"], histDict["bins"], histDict["range"][0], histDict["range"][1]) for cut in jetCutList }
+
+    # Loop on the jets and fill histograms
+    for entry in xrange(tree.GetEntries()):
+        tree.GetEntry(entry)
+        for cut in jetCutList:
+            if cut["formula"].EvalInstance():
+                for histDict in histList:
+                    value = tree.__getattr__(histDict["var"])
+                    # We don't want to include the under/overflow:
+                    if value >= histDict["range"][0] and value < histDict["range"][1]:
+                        histDict["cutDict"][ cut["name"] ].Fill(value)
+
+    # Write histograms to output file
+    for histDict in histList:
+        for cut, hist in histDict["cutDict"].items():
+            outFile.cd(cut)
+            hist.Write(histDict["name"])
+    outFile.Close()
+
