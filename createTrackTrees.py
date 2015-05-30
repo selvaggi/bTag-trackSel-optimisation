@@ -6,8 +6,8 @@ rootFileNames = ["JetTree_phys14_1.root"]
 treeDirectory = "btagana/ttree"
 doPTreweight = True
 trackSelection = "bTag"    #"bTagLoosened", "no", "dist", "bTag"
-outFileSig = "sigTrackTree_"+trackSelection+"noTrackSel.root"
-outFileBkg = "bkgTrackTree_"+trackSelection+"noTrackSel.root"
+outFileSig = "sigTrackTree_"+trackSelection+"TrackSel.root"
+outFileBkg = "bkgTrackTree_"+trackSelection+"TrackSel.root"
 
 TrackVars = {
 

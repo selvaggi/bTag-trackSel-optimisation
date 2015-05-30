@@ -48,7 +48,40 @@ def train_MVA(bkgTree, sigTree, discriList, MVAmethod,label):
     factory.EvaluateAllMethods()
     file_MVA.Close()
 
-def evaluate_BDT(bkgTree,sigTree,discri1,discri2,label):     # TO BE FIXED (from an old code) 
+def MVA_out_in_tree(files, treeName, discriList, xmlFile, MVAname, outFileName):   
+
+    chain = ROOT.TChain(treeName)
+    for file in files:
+        chain.Add(file)
+        
+    file_withBDTout = ROOT.TFile(outFileName, "recreate")
+    tree_withBDTout = chain.CloneTree(0)
+    print "Number of input tree entries : ", chain.GetEntries()
+    
+    leave_BDTout = "MVA_"+MVAname
+    BDT_out = array('d',[0])
+    tree_withBDTout.Branch(leave_BDTout, BDT_out, leave_BDTout+"/D")    
+
+    reader = ROOT.TMVA.Reader()
+
+    dict_variableName_Array = {variable : array('f', [0]) for variable in discriList}
+    for var in discriList :
+        reader.AddVariable(var, dict_variableName_Array[var])
+
+    reader.BookMVA(MVAname, xmlFile)
+
+    for entry in xrange(chain.GetEntries()):
+        chain.GetEntry(entry)
+        for var in discriList :
+            dict_variableName_Array[var][0] = getattr(chain, var)
+        BDT_out[0] = reader.EvaluateMVA(MVAname)
+        tree_withBDTout.Fill()
+    print "Number of output tree entries : ",tree_withBDTout.GetEntries()
+    tree_withBDTout.Write()
+    file_withBDTout.Close()
+    print "Output file : ", outFileName, " written."
+
+def evaluate_BDT(bkgTree, sigTree, discriList, MVAname):     # TO BE FIXED (from an old code) 
 
     file_proc1 = ROOT.TFile(bkgTree)    
     file_proc2 = ROOT.TFile(sigTree)    
@@ -108,42 +141,4 @@ def evaluate_BDT(bkgTree,sigTree,discri1,discri2,label):     # TO BE FIXED (from
     
     drawDoublehisto(histo_proc1_BDT800_out,histo_proc2_BDT800_out,canvasName,xlabel,ylabel,legend,leftText,rightText,format,directory,0)
 
-
-def MVA_out_in_tree(files,discri1,discri2,label):   # TO BE FIXED
-# NB files is a list of TFile without the .root extension
-
-    for file in files:
-        print "Input file : ",file+".root"
-        
-        file_in = ROOT.TFile(file+".root","read")
-        file_withBDTout = ROOT.TFile(file+"_withBDTout_"+label+".root","recreate")
-        
-        tree_in = file_in.Get("Event")
-        tree_withBDTout = tree_in.CloneTree(0)
-        print "Number of input tree entries : ",tree_in.GetEntries()
-        
-        leave_BDTout="BDTout_"+label+"/D"
-        BDT_out=array('d',[0])
-        tree_withBDTout.Branch("BDTout_"+label,BDT_out,leave_BDTout)    
-    
-        reader = ROOT.TMVA.Reader()
-    
-        var_discri1 = array('f',[0])
-        reader.AddVariable(discri1,var_discri1)
-        var_discri2 = array('f',[0])
-        reader.AddVariable(discri2,var_discri2)
-    
-        reader.BookMVA("BDT800_"+label,"weights/BDT_BDT800_"+label+".weights.xml")
-    
-        for entry in xrange(tree_in.GetEntries()):
-            tree_in.GetEntry(entry)
-            var_discri1[0] = getattr(tree_in,discri1)
-            var_discri2[0] = getattr(tree_in,discri2)
-            BDT_out[0]=reader.EvaluateMVA("BDT800_"+label)
-            tree_withBDTout.Fill()
-        print "Number of output tree entries : ",tree_withBDTout.GetEntries()
-        tree_withBDTout.Write()
-        file_withBDTout.Close()
-        file_in.Close()
-        print "Output file : ",file+"_withBDTout_"+label+".root", " written."
 
