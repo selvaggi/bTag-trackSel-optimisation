@@ -238,7 +238,8 @@ def drawEffVsCutCurve(myTH1, total = 0):
 
 
 def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants):
-    """ Draw ROC curves from TGraphs (stored in inFile) of efficiency vs. discriminant cut value.
+    """ Draw ROC curves from TGraphs (stored in inFile) of efficiency vs. discriminant cut value,
+    created by the function createDiscrHist().
     Store the curves in outFile. """
 
     inputFile = ROOT.TFile(inFile, "read")
