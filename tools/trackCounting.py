@@ -1,5 +1,6 @@
 import ROOT
 from array import array
+import numpy as np
 import os
 import sys
 import warnings
@@ -171,6 +172,7 @@ def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetC
         cut["formula"] = ROOT.TTreeFormula(cut["name"], cut["cuts"], tree)
         tree.SetNotify(cut["formula"])
         outFile.mkdir(cut["name"])
+        cut["total"] = 0 # keep track of the total number of entries for each jet category
 
     # For each histogram of histList, and for each cut of jetCutList, define a TH1
     for histDict in histList:
@@ -181,16 +183,113 @@ def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetC
         tree.GetEntry(entry)
         for cut in jetCutList:
             if cut["formula"].EvalInstance():
+                cut["total"] += 1
                 for histDict in histList:
                     value = tree.__getattr__(histDict["var"])
                     # We don't want to include the under/overflow:
                     if value >= histDict["range"][0] and value < histDict["range"][1]:
                         histDict["cutDict"][ cut["name"] ].Fill(value)
 
+    for cut in jetCutList:
+        print "Total number of entries for category {}: {}.".format(cut["name"], cut["total"]) 
+
     # Write histograms to output file
-    for histDict in histList:
-        for cut, hist in histDict["cutDict"].items():
-            outFile.cd(cut)
-            hist.Write(histDict["name"])
+    for cut in jetCutList:
+        outFile.cd(cut["name"])
+        for histDict in histList:
+            histDict["cutDict"][ cut["name"] ].Write(histDict["name"])
+
+    # For those who asked it, create TGraph of eff. vs. cut value:
+    for cut in jetCutList:
+        outFile.cd(cut["name"])
+
+        for histDict in histList:
+            if "discreff" in histDict.keys():
+                if histDict["discreff"] is True:
+                    myGraph = drawEffVsCutCurve(myTH1 = histDict["cutDict"][ cut["name"] ], total = cut["total"])
+                    myGraph.Write(histDict["name"] + "_graph")
+
     outFile.Close()
+
+
+def drawEffVsCutCurve(myTH1, total = 0):
+    """ Create and return eff. vs. cut TGraph, from a one-dimensional histogram.
+    The efficiencies are computed relative to the histogram's integral,
+    or relative to 'total' if it is given. """
+
+    discrV = [ myTH1.GetBinLowEdge(1) ]
+    integral = myTH1.Integral()
+    effV = [ integral ]
+
+    for i in xrange(2, myTH1.GetNbinsX()):
+        discrV.append(myTH1.GetBinLowEdge(i))
+        integral -= myTH1.GetBinContent(i-1)
+        effV.append(integral)
+
+    # We may want the max. efficiency to be correctly normalised,
+    # if the TH1 passed as argument doesn't cover the whole range.
+    if total is not 0:
+        if total < integral:
+            print "Warning in createEffVsCutCurve: total number specified to be *smaller* than the histograms's integral. Something might be wrong."
+        integral = total
+    effV = [ x/integral for x in effV ]
+    
+    return ROOT.TGraph(len(discrV), np.array(discrV), np.array(effV))
+
+
+def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants):
+    """ Draw ROC curves from TGraphs (stored in inFile) of efficiency vs. discriminant cut value,
+    created by the function createDiscrHist().
+    Store the curves in outFile. """
+
+    inputFile = ROOT.TFile(inFile, "read")
+
+    sigGraphs = { discri: inputFile.Get(sigCat + "/" + discri + "_graph") for discri in discriminants }
+    bkgGraphDict = {}
+    for bkg in bkgCats:
+        bkgGraphDict[bkg] = { discri: inputFile.Get(bkg + "/" + discri + "_graph") for discri in discriminants }
+
+    outputFile = ROOT.TFile(outFile, "recreate")
+
+    for bkg, graphs in bkgGraphDict.items():
+        outputFile.mkdir(sigCat + "_vs_" + bkg)
+        outputFile.cd(sigCat + "_vs_" + bkg)
+
+        for discri in discriminants:
+            myROC = drawROCfromEffVsCutCurves(sigGraphs[discri], graphs[discri])
+            myROC.Write(discri)
+
+    inputFile.Close()
+    outputFile.Close()
+
+
+def drawROCfromEffVsCutCurves(sigGraph, bkgGraph):
+    """ Return ROC curve drawn from the "efficiency vs. discriminant" cut curves of signal and background. 
+    For now, assume the range and binning of the discriminants is the same for both signal and background.
+    This might have to be refined. """
+
+    nPoints = sigGraph.GetN() 
+
+    if nPoints != bkgGraph.GetN():
+        print "Background and signal curves must have the same number of entries!"
+        print "Entries signal:     {}".format(nPoints) 
+        print "Entries background: {}".format(bkgGraph.GetN())
+        sys.exit(1)
+
+    sigEff = []
+    bkgEff = []
+
+    for i in range(nPoints):
+        sigValX = ROOT.Double()
+        sigValY = ROOT.Double()
+        bkgValX = ROOT.Double()
+        bkgValY = ROOT.Double()
+
+        sigGraph.GetPoint(i, sigValX, sigValY)
+        bkgGraph.GetPoint(i, bkgValX, bkgValY)
+
+        sigEff.append(sigValY)
+        bkgEff.append(bkgValY)
+
+    return ROOT.TGraph(nPoints, np.array(sigEff), np.array(bkgEff))
 
