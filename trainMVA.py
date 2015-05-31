@@ -1,4 +1,4 @@
-from MVA_facilities import train_MVA
+from tools.MVA_facilities import train_MVA
 #from createTrackTrees import TrackVars
 
 #HitPix >= 2 and HitAll>=8 and IP2D<0.2 and Pt>1 and Chi2 < 5 and ZIP < 17 and Length <50 and Dist < 0.07

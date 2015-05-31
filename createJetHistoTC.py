@@ -1,5 +1,5 @@
 import os
-from trackCounting import createDiscrHist
+from tools.trackCounting import createDiscrHist
 
 rootFileNames = ["../myTrees/jetTree_TC_btagCuts_MLP_Nplus5_noSel.root"]
 treeDirectory = "jetTree"

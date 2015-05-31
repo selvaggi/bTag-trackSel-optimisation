@@ -1,4 +1,4 @@
-from tools import *
+from tools.crabOutAnalyzer import *
 import os
 
 # to do :  script de comparaison des info des track pour jet signaux et bkg
