@@ -1,6 +1,6 @@
 import os
-from trackCounting import gt, geq, lt, leq, eq, neq
-from trackCounting import createJetTreeTC
+from tools.trackCounting import gt, geq, lt, leq, eq, neq
+from tools.trackCounting import createJetTreeTC
 
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
 rootFileNames = ["JetTree_phys14_1.root"]
@@ -17,7 +17,17 @@ trackCut = [ # bTag current selection
     ( "Track_length", lt, 50 ),
     ( "Track_dist", lt, 0.07 )
 ]
-#return HitPix >= 1 and HitAll>=6 and IP2D<0.3 and Pt>0.5 and Chi2 < 7 and ZIP < 20 and Length <60 and Dist < 0.1
+# Failed try: we cannot use TTreeFormula, because what we access is not
+# Track_pt but Track_pt[tracknumber]. Any better solution?
+#trackCut = "Track_nHitPixel >= 2 && \
+#            Track_nHitAll >= 8 && \
+#            Track_IP2D < 0.2 && \
+#            Track_pt > 1 && \
+#            Track_chi2 < 5 && \
+#            Track_zIP < 17 && \
+#            Track_length < 50 && \
+#            Track_dist < 0.07\
+#            " # bTag current selection
 
 # Variables used by TMVA
 # Caution! Needs to be same order as when the MVA was trained! (thank you TMVA)
