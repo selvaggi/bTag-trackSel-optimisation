@@ -31,22 +31,47 @@ histList.append({
     "var": "Jet_Ip",
     "name": "Jet_Ip",
     "title": "Jet first track IP sig.",
-    "bins": 200,
-    "range": [-10000,10000],
+    "bins": 100,
+    "range": [-100,100],
     })
 histList.append({
     "var": "TCHE",
     "name": "TCHE",
     "title": "Jet TCHE",
-    "bins": 200,
-    "range": [-10000,10000],
+    "bins": 100,
+    "range": [-100,100],
     })
 histList.append({
     "var": "TCHP",
     "name": "TCHP",
     "title": "Jet TCHP",
-    "bins": 200,
-    "range": [-10000,10000],
+    "bins": 100,
+    "range": [-100,100],
+    })
+# These will also included, and will be used to draw an "efficiency vs. cut value" curve
+histList.append({
+    "var": "Jet_Ip",
+    "name": "Jet_Ip_DiscrEff",
+    "title": "Jet first track IP sig.",
+    "bins": 2000,
+    "range": [-5,15],
+    "discreff": True
+    })
+histList.append({
+    "var": "TCHE",
+    "name": "TCHE_DiscrEff",
+    "title": "Jet TCHE",
+    "bins": 2000,
+    "range": [-5,15],
+    "discreff": True
+    })
+histList.append({
+    "var": "TCHP",
+    "name": "TCHP_DiscrEff",
+    "title": "Jet TCHP",
+    "bins": 2000,
+    "range": [-5,15],
+    "discreff": True
     })
 
 jetCutList = []
