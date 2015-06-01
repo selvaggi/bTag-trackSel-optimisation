@@ -16,37 +16,37 @@ canvasCfg = []
 # The graphs we want to include in the first canvas
 myGraphs = [
         {   
-            "file": "../myTrees/jetROC_TC_bTagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
+            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
             "key": "Bjets_vs_Lightjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
             "name": "Light jets", # name to be used in the legend
             "color": ROOT.kBlue,
-            "style": "ALP",
+            "style": "AL",
             "markerStyle": 20, # Only used if "P" in "style" (default 20)
             "markerSize": 1.5, # (default 1)
             "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 1, # (default 1)
+            "lineWidth": 2, # (default 1)
         },
         {   
-            "file": "../myTrees/jetROC_TC_bTagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Cjets_vs_Lightjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
+            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
+            "key": "Bjets_vs_Cjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
             "name": "C-jets", # name to be used in the legend
             "color": ROOT.kGreen,
-            "style": "ALP",
+            "style": "AL",
             "markerStyle": 20, # Only used if "P" in "style" (default 20)
             "markerSize": 1.5, # (default 1)
             "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 1, # (default 1)
+            "lineWidth": 2, # (default 1)
         },
         {   
-            "file": "../myTrees/jetROC_TC_bTagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "PUjets_vs_Lightjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
+            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
+            "key": "Bjets_vs_PUjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
             "name": "PU-jets", # name to be used in the legend
             "color": ROOT.kMagenta,
-            "style": "ALP",
+            "style": "AL",
             "markerStyle": 20, # Only used if "P" in "style" (default 20)
             "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 1, # (default 1)
+            "lineStyle": 1, # Only used if "L" or "C" in "style" (default 1)
+            "lineWidth": 2, # (default 1)
         },
     ]
 
@@ -56,6 +56,8 @@ myCanvas = {
         "xSize": 800,
         "ySize": 600,
         "title": "TCHE performances", # optional
+        "xRange": [-1,1], # optional
+        "yRange": [10**-2,1], # optional
         "grid": "xy", # optional
         "log": "y", # optional
         "xTitle": "Signal efficiency", # optional
@@ -66,6 +68,6 @@ canvasCfg.append(myCanvas)
 
 # We're all set!
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     drawTGraphs(runCfg, canvasCfg)
 
