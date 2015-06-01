@@ -50,6 +50,64 @@ def printCanvas(canvas, name, format, directory):
         outFile = os.path.join(directory, name) + "." + format
         canvas.Print(outFile)
 
+def drawTGraphs(runCfg, drawCfg):
+
+    try:
+        outDir = os.path.basename(runCfg["outFile"])
+    except KeyError:
+        # We simply do not write to a ROOT outputfile
+        outFile = None
+    else:
+        if not os.path.isdir(outDir):
+            print "Directory {} does not exist, creating it.".format(outDir)
+            os.makedirs(outDir)
+        outFile = ROOT.TFile(runCfg["outFile"], "recreate")
+
+    try:
+        if runCfg["batch"] is True:
+            print "Setting batch mode."
+            ROOT.gROOT.SetBatch(ROOT.kTRUE)
+    except KeyError:
+        pass
+
+    for canvasCfg in drawCfg:
+        print "Drawing canvas {}.".format(canvasCfg["name"])
+        
+        if outFile is not None:
+            outFile.mkdir(canvasCfg["name"])
+        
+        myCnv = drawTGraphCanvas(canvasCfg)
+
+        # We put the canvas in a ROOTfile directory
+        if outFile is not None:
+            outFile.cd(canvasCfg["name"])
+            myCnv.Write(canvasCfg["name"])
+
+        # Only print to a file is "printDir" is specified
+        try:
+            printDir = runCfg["printDir"]
+        except KeyError:
+            printDir = None
+        else:
+            if not os.path.isdir(printDir):
+                print "Directory {} does not exist, creating it.".format(printDir)
+                os.makedirs(printDir)
+
+        if printDir is not None:
+            try:
+                printFormats = runCfg["formats"]
+            except KeyError:
+                print "Output format not specified, taking png by default."
+                printFormats = ["png"]
+            for format in printFormats:
+                printCanvas(myCnv, canvasCfg["name"], format, printDir)
+
+    if outFile is not None:
+        outFile.Close()
+
+def drawTGraphCanvas(canvasCfg):
+   myCnv = ROOT.TCanvas( 
+    
 
 def drawRocCurve(graph, name, xlabel, ylabel, leftText, rightText, format, directory, logX):
     canvas = TCanvas(name, name)
