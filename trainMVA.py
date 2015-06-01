@@ -5,10 +5,10 @@ from tools.MVA_facilities import train_MVA
 
 TrackVars = [
 
-    "Track_zIP",
+    "Track_dz",
     "Track_length",
     "Track_dist",
-    "Track_IP2D",
+    "Track_dxy",
     "Track_pt",
     "Track_chi2",
     "Track_nHitPixel",
