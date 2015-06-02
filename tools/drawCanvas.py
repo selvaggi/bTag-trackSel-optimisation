@@ -51,6 +51,8 @@ def printCanvas(canvas, name, format, directory):
         canvas.Print(outFile)
 
 def drawTGraphs(runCfg, drawCfg):
+    if runCfg is None or drawCfg is None:
+        return
 
     try:
         outDir = os.path.dirname(runCfg["outFile"])
@@ -106,7 +108,7 @@ def drawTGraphs(runCfg, drawCfg):
         outFile.Close()
 
 def drawTGraphCanvas(cCfg):
-    #myGstyle() # global variables powaaaa
+    myBTGStyle() # global variables powaaaa
 
     # Create Canvas (title optional)
     try:
@@ -133,14 +135,19 @@ def drawTGraphCanvas(cCfg):
     except KeyError:
         pass
 
-    myLeg = ROOT.TLegend(0.1, 0.1, 0.5, 0.5) # To be tuned
+    myLeg = ROOT.TLegend(0.15, 0.85-0.065*len(cCfg["graphs"]), 0.35, 0.87) # To be tuned
+    # We need to keep track of ALL the objects created here, otherwise they will be deleted
+    # when the function end and the TCanvas will end up containing only the TGraphs (and not the legend, ...)
+    cCfg["_legend"] = myLeg
 
     xMax = -10**10
     xMin = 10**10
     yMax = -10**10
     yMin = 10**10
 
-    #myMG = ROOT.TMultiGraph(cCfg["name"], cCfg["title"])
+    # We use a TH1, to be drawn first, to take care of the editing of the axes (titles, ranges, ...)
+    myTH = ROOT.TH1D("temp", "temp", 10, -1, 1)
+    cCfg["_TH1"] = myTH
 
     for i,gCfg in enumerate(cCfg["graphs"]):
         print "Drawing graph for {}.".format(gCfg["name"])
@@ -159,8 +166,7 @@ def drawTGraphCanvas(cCfg):
         gCfg["style"] = gCfg["style"].lower()
         # There is no "same" option for drawing TGraphs
         # This is achieved by drawing without the "axis" option, hence:
-        if i > 0:
-            gCfg["style"] = gCfg["style"].replace("a", "")
+        gCfg["style"] = gCfg["style"].replace("a", "")
 
         # If drawn with line, set color, style and width
         if "l" in gCfg["style"] or "c" in gCfg["style"]:
@@ -207,55 +213,20 @@ def drawTGraphCanvas(cCfg):
         if yMaxTemp > yMax: yMax = yMaxTemp
         if yMinTemp < yMin: yMin = yMinTemp
 
-        # Time to draw!
-        gr.Draw(gCfg["style"])
-        #myMG.Add(gr, gCfg["style"])
-        gCfg["graph"] = gr
+        gCfg["_graph"] = gr
         
         file.Close()
 
-    #myMG.Draw("alp")
-    myLeg.Draw("same")
-
-    # The first graph in the list to be drawn defines the titles and range in the canvas:
-
-    #try:
-    #    myMG.GetXaxis().SetTitle(cCfg["xTitle"])
-    #except KeyError:
-    #    pass
-    #try:
-    #    myMG.GetYaxis().SetTitle(cCfg["yTitle"])
-    #except KeyError:
-    #    pass
-    #try:
-    #    myMG.SetTitle(cCfg["title"])
-    #except KeyError:
-    #    pass
-    #
-    #if "xRange" not in cCfg.keys():
-    #    cCfg["xRange"] = [ 1.1*xMin, 1.1*xMax ]
-    #else:
-    #    if cCfg["xRange"][0] > cCfg["xRange"][1]:
-    #        cCfg["xRange"].reverse()
-    #myMG.GetXaxis().SetRangeUser(cCfg["xRange"][0], cCfg["xRange"][1])
-    #
-    #if "yRange" not in cCfg.keys():
-    #    cCfg["yRange"] = [ 1.1*yMin, 1.1*yMax ]
-    #else:
-    #    if cCfg["yRange"][0] > cCfg["yRange"][1]:
-    #        cCfg["yRange"].reverse()
-    #myMG.GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
-    
     try:
-        cCfg["graphs"][0]["graph"].GetXaxis().SetTitle(cCfg["xTitle"])
+        myTH.GetXaxis().SetTitle(cCfg["xTitle"])
     except KeyError:
         pass
     try:
-        cCfg["graphs"][0]["graph"].GetYaxis().SetTitle(cCfg["yTitle"])
+        myTH.GetYaxis().SetTitle(cCfg["yTitle"])
     except KeyError:
         pass
     try:
-        cCfg["graphs"][0]["graph"].SetTitle(cCfg["title"])
+        myTH.SetTitle(cCfg["title"])
     except KeyError:
         pass
 
@@ -264,14 +235,19 @@ def drawTGraphCanvas(cCfg):
     else:
         if cCfg["xRange"][0] > cCfg["xRange"][1]:
             cCfg["xRange"].reverse()
-    cCfg["graphs"][0]["graph"].GetXaxis().SetRangeUser(cCfg["xRange"][0], cCfg["xRange"][1])
-    
+    myTH.GetXaxis().SetRangeUser(cCfg["xRange"][0], cCfg["xRange"][1])
     if "yRange" not in cCfg.keys():
         cCfg["yRange"] = [ 1.1*yMin, 1.1*yMax ]
     else:
         if cCfg["yRange"][0] > cCfg["yRange"][1]:
             cCfg["yRange"].reverse()
-    cCfg["graphs"][0]["graph"].GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
+    myTH.GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
+
+    # Time to draw!
+    myTH.Draw()
+    for gr in cCfg["graphs"]:
+        gr["_graph"].Draw(gr["style"])
+    myLeg.Draw("same")
 
     return myCnv
 
@@ -383,55 +359,60 @@ def drawTriplehisto(h1, h2, h3, name, xlabel, ylabel, legend, leftText, rightTex
     printCanvas(canvas, name, format, directory) 
 # lepPosMiddle[4] = {0.4, 0.4, 0.6, 0.6} 
 
-def drawTGraph(graphs, name, xlabel, ylabel, legend, leftText, rightText, format, directory):
-    canvas = ROOT.TCanvas(name, name)
-    canvas.SetGridx()
-    canvas.SetGridy()
-    Tleft = ROOT.TLatex(0.125, 0.91, leftText) 
-    Tleft.SetNDC(kTRUE) 
-    Tleft.SetTextSize(0.048) 
-    font = Tleft.GetTextFont() 
-    #TPaveText* Tright = new TPaveText(0.8, 0.85, 0.945, 0.90, "NDC") 
-    #Tright.SetTextFont(font) 
-    #Tright.AddText(rightText) 
-    #Tright.SetFillColor(0)
-    mg = ROOT.TMultiGraph()
-    for graph in graphs:
-        mg.Add(graph)
-    mg.Draw("AP") 
-    mg.GetXaxis().SetTitle(xlabel)
-    mg.GetXaxis().SetTitleFont(font)
-    #mg.GetYaxis().SetRangeUser(0.7, 1.3)
-    mg.GetYaxis().SetTitle(ylabel)
-    mg.GetYaxis().SetTitleFont(font)
-    mg.GetYaxis().SetTitleOffset(0.87)
-    mg.SetTitle("")
-    legend.SetTextFont(font) 
-    legend.Draw() 
-    Tleft.Draw() 
-    #Tright.Draw() 
-    canvas.Write() 
-    printCanvas(canvas, name, format, directory) 
-# lepPosMiddle[4] = {0.4, 0.4, 0.6, 0.6}
+def myGstyle():
+    gROOT.SetStyle("Plain") 
+    gStyle.SetOptStat(0) 
+    gStyle.SetOptTitle(0) 
+    # Fonts
+    gStyle.SetTextFont(132) 
+    gStyle.SetTextSize(0.08) 
+    gStyle.SetLabelFont(132, "x") 
+    gStyle.SetLabelFont(132, "y") 
+    gStyle.SetTitleOffset(1, "x") 
+    gStyle.SetTitleOffset(1, "y") 
+    gStyle.SetLabelFont(132, "z") 
+    gStyle.SetLabelSize(0.05, "x") 
+    gStyle.SetTitleSize(0.06, "x") 
+    gStyle.SetLabelSize(0.05, "y") 
+    gStyle.SetTitleSize(0.06, "y") 
+    gStyle.SetLabelSize(0.05, "z") 
+    gStyle.SetTitleSize(0.06, "z") 
+    gStyle.SetHistLineWidth(2) 
+    gStyle.SetHistLineColor(1) 
+
+    gStyle.SetPadBorderMode(0) 
+    gStyle.SetPadColor(0) 
+
+    gStyle.SetPaperSize(20, 26) 
+    gStyle.SetPadTopMargin(0.10)  #055) 
+    gStyle.SetPadRightMargin(0.055) 
+    gStyle.SetPadBottomMargin(0.15) 
+    gStyle.SetPadLeftMargin(0.125) 
+
+    gStyle.SetFrameBorderMode(0) 
+
+    #gStyle.SetPadTickX(1) # To get tick marks on the opposite side of the frame
+    #gStyle.SetPadTickY(1) 
 
 def myGstyle():
-    ROOT.gROOT.SetStyle("Plain") 
+    #ROOT.gROOT.SetStyle("Plain") 
     ROOT.gStyle.SetOptStat(0) 
-    ROOT.gStyle.SetOptTitle(0) 
+    #ROOT.gStyle.SetOptTitle(0) 
     # Fonts
     ROOT.gStyle.SetTextFont(42) 
-    ROOT.gStyle.SetTextSize(0.08) 
+    ROOT.gStyle.SetTextSize(0.06) 
+    ROOT.gStyle.SetTitleBorderSize(0)
     ROOT.gStyle.SetLabelFont(42, "x") 
     ROOT.gStyle.SetLabelFont(42, "y") 
-    ROOT.gStyle.SetTitleOffset(1, "x") 
-    ROOT.gStyle.SetTitleOffset(1, "y") 
+    ROOT.gStyle.SetTitleOffset(1.1, "x") 
+    ROOT.gStyle.SetTitleOffset(1.2, "y") 
     ROOT.gStyle.SetLabelFont(42, "z") 
     ROOT.gStyle.SetLabelSize(0.05, "x") 
-    ROOT.gStyle.SetTitleSize(0.04, "x") 
+    ROOT.gStyle.SetTitleSize(0.05, "x") 
     ROOT.gStyle.SetLabelSize(0.05, "y") 
-    ROOT.gStyle.SetTitleSize(0.04, "y") 
+    ROOT.gStyle.SetTitleSize(0.05, "y") 
     ROOT.gStyle.SetLabelSize(0.05, "z") 
-    ROOT.gStyle.SetTitleSize(0.06, "z") 
+    ROOT.gStyle.SetTitleSize(0.05, "z") 
     ROOT.gStyle.SetHistLineWidth(2) 
     ROOT.gStyle.SetHistLineColor(1) 
 
@@ -449,3 +430,45 @@ def myGstyle():
     #ROOT.gStyle.SetPadTickX(1) # To get tick marks on the opposite side of the frame
     #ROOT.gStyle.SetPadTickY(1) 
 
+def myBTGStyle():
+    ROOT.gStyle.SetFrameBorderMode(0)
+    ROOT.gStyle.SetCanvasBorderMode(0)
+    ROOT.gStyle.SetPadBorderMode(0)
+
+    ROOT.gStyle.SetFrameFillColor(0)
+    ROOT.gStyle.SetPadColor(0)
+    ROOT.gStyle.SetCanvasColor(0)
+    ROOT.gStyle.SetTitleColor(1)
+    ROOT.gStyle.SetStatColor(0)
+
+    # set the paper & margin sizes
+    ROOT.gStyle.SetPaperSize(20,26)
+    ROOT.gStyle.SetPadTopMargin(0.10)
+    ROOT.gStyle.SetPadRightMargin(0.03)
+    ROOT.gStyle.SetPadBottomMargin(0.13)
+    ROOT.gStyle.SetPadLeftMargin(0.125)
+    ROOT.gStyle.SetPadTickX(1)
+    ROOT.gStyle.SetPadTickY(1)
+    
+    ROOT.gStyle.SetTextFont(42) #132
+    ROOT.gStyle.SetTextSize(0.09)
+    ROOT.gStyle.SetLabelFont(42,"xyz")
+    ROOT.gStyle.SetTitleFont(42,"xyz")
+    ROOT.gStyle.SetLabelSize(0.045,"xyz") #0.035
+    ROOT.gStyle.SetTitleSize(0.045,"xyz")
+    ROOT.gStyle.SetTitleOffset(1.15,"y")
+    
+    # use bold lines and markers
+    ROOT.gStyle.SetMarkerStyle(8)
+    ROOT.gStyle.SetHistLineWidth(2)
+    ROOT.gStyle.SetLineWidth(1)
+    #ROOT.gStyle.SetLineStyleString(2,"[12 12]") // postscript dashes
+
+    # do not display any of the standard histogram decorations
+    ROOT.gStyle.SetOptTitle(1)
+    ROOT.gStyle.SetOptStat(0) #("m")
+    ROOT.gStyle.SetOptFit(0)
+    
+    #ROOT.gStyle.SetPalette(1,0)
+    ROOT.gStyle.cd()
+    ROOT.gROOT.ForceStyle()
