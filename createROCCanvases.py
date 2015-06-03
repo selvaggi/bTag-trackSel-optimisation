@@ -80,8 +80,8 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA065_MVA07_MVA075_MVA08.root",
-        "printDir": "./btagCutsOnly_MVA065_MVA07_MVA075_MVA08_plots", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA065_MVA07_MVA075_MVA08_test.root",
+        "printDir": "./btagCutsOnly_MVA066_MVA07_MVA075_MVA08_plots_test", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
