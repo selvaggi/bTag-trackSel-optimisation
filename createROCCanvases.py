@@ -80,8 +80,8 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA065_MVA07_MVA075_MVA08_test.root",
-        "printDir": "./btagCutsOnly_MVA066_MVA07_MVA075_MVA08_plots_test", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA065_MVA07_MVA075_MVA08.root",
+        "printDir": "./btagCutsOnly_MVA065_MVA07_MVA075_MVA08_plots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
@@ -113,7 +113,7 @@ for discr in discriminants:
                 "xSize": xSize,
                 "ySize": ySize,
                 "title": discr["title"] + " " + flav["title"],
-                "legPos": "tl", # t/b, l/r
+                "legPos": "br", # t/b, l/r
                 "xRange": xRange, # optional
                 "yRange": yRange, # optional
                 "grid": grid, # optional
