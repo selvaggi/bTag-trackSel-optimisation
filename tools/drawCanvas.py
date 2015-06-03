@@ -9,7 +9,7 @@ def drawDoublehisto(h1, h2, name, xlabel, ylabel, legend, leftText, rightText, f
     if logY : 
         canvas.SetLogy(1)
     Tleft = ROOT.TLatex(0.125, 0.91, leftText) 
-    Tleft.SetNDC(kTRUE) 
+    Tleft.SetNDC(ROOT.kTRUE) 
     Tleft.SetTextSize(0.048) 
     font = Tleft.GetTextFont() 
     #TPaveText* Tright = new TPaveText(0.8, 0.85, 0.945, 0.90, "NDC") 
@@ -510,7 +510,7 @@ def drawTriplehisto(h1, h2, h3, name, xlabel, ylabel, legend, leftText, rightTex
     canvas = ROOT.TCanvas(name, name) 
     if logY : canvas.SetLogy(1)
     Tleft = ROOT.TLatex(0.125, 0.91, leftText) 
-    Tleft.SetNDC(kTRUE) 
+    Tleft.SetNDC(ROOT.kTRUE) 
     Tleft.SetTextSize(0.048) 
     font = Tleft.GetTextFont() 
     #TPaveText* Tright = new TPaveText(0.8, 0.85, 0.945, 0.90, "NDC") 
