@@ -50,8 +50,8 @@ def printCanvas(canvas, name, format, directory):
         outFile = os.path.join(directory, name) + "." + format
         canvas.Print(outFile)
 
-def drawTGraphs(runCfg, drawCfg):
-    if runCfg is None or drawCfg is None:
+def drawCanvas(runCfg, drawCfg, mode):
+    if runCfg is None or drawCfg is None or mode is None:
         return
 
     try:
@@ -79,8 +79,14 @@ def drawTGraphs(runCfg, drawCfg):
         
         if outFile is not None:
             outFile.mkdir(canvasCfg["name"])
-        
-        myCnv = drawTGraphCanvas(canvasCfg)
+       
+        myCnv = None
+        if mode == "TH1":
+            myCnv = drawTH1Canvas(canvasCfg)
+        elif mode == "TGraph":
+            myCnv = drawTGraphCanvas(canvasCfg)
+        else:
+            raise Exception("Running mode was not specified correctly.")
 
         # We put the canvas in a ROOTfile directory
         if outFile is not None:
@@ -108,6 +114,146 @@ def drawTGraphs(runCfg, drawCfg):
 
     if outFile is not None:
         outFile.Close()
+
+def drawTH1Canvas(cCfg):
+    myBTGStyle() # global variables powaaaa
+
+    # Create Canvas (title optional)
+    try:
+        title = cCfg["title"]
+    except KeyError:
+        title = ""
+    myCnv = ROOT.TCanvas(cCfg["name"], cCfg["title"], cCfg["xSize"], cCfg["ySize"])
+    
+    # Set Grid
+    try:
+        if "x" in cCfg["grid"].lower():
+            myCnv.SetGridx()
+        if "y" in cCfg["grid"].lower():
+            myCnv.SetGridy()
+    except KeyError:
+        pass
+    
+    # Set log axes
+    try:
+        if "x" in cCfg["log"].lower():
+            myCnv.SetLogx()
+        if "y" in cCfg["log"].lower():
+            myCnv.SetLogy()
+    except KeyError:
+        pass
+
+    myLeg = ROOT.TLegend(0.15, 0.85-0.065*len(cCfg["hists"]), 0.35, 0.87) # To be tuned
+    # We need to keep track of ALL the objects created here, otherwise they will be deleted
+    # when the function end and the TCanvas will end up containing only the TGraphs (and not the legend, ...)
+    cCfg["_legend"] = myLeg
+
+    xMax = -10**10
+    xMin = 10**10
+    yMax = -10**10
+    yMin = 10**10
+
+    for i,hCfg in enumerate(cCfg["hists"]):
+        print "Drawing graph for {}.".format(hCfg["name"])
+
+        # Retrieve TGraph from file
+        if not os.path.isfile(hCfg["file"]):
+            raise Exception("File {} not found!".format(hCfg["file"]))
+        file = ROOT.TFile(hCfg["file"], "read")
+        gr = file.Get(hCfg["key"])
+        if not isinstance(gr, ROOT.TH1):
+            raise Exception("Could not retrieve properly TH1 {} from file {}.".format(cCfg["key"], hCfg["file"]))
+
+        legStyle = ""
+    
+        # This is for easier checking:
+        hCfg["style"] = hCfg["style"].lower()
+        # There is no "same" option for drawing TGraphs
+        # This is achieved by drawing without the "axis" option, hence:
+        hCfg["style"] = hCfg["style"].replace("a", "")
+
+        # If drawn with line, set color, style and width
+        if "l" in hCfg["style"] or "c" in hCfg["style"]:
+            legStyle += "l"
+            gr.SetLineColor(hCfg["color"])
+            try:
+                gr.SetLineStyle(hCfg["lineStyle"])
+            except KeyError:
+                gr.SetLineStyle(1)
+            try:
+                gr.SetLineWidth(hCfg["lineWidth"])
+            except KeyError:
+                gr.SetLineWidth(1)
+
+        # If drawn with markers, set color, style and size
+        if "p" in hCfg["style"]:
+            legStyle += "p"
+            gr.SetMarkerColor(hCfg["color"])
+            try:
+                gr.SetMarkerStyle(hCfg["markerStyle"])
+            except KeyError:
+                gr.SetMarkerStyle(20)
+            try:
+                gr.SetMarkerSize(hCfg["markerSize"])
+            except KeyError:
+                gr.SetMarkerSize(1)
+
+        if "e" in hCfg["style"]:
+            legStyle += "e"
+
+        # Add to the legend
+        myLeg.AddEntry(gr, hCfg["name"], legStyle)
+
+        # Retrieve x and y range
+        xMaxTemp = ROOT.Double()
+        xMinTemp = ROOT.Double()
+        yMaxTemp = ROOT.Double()
+        yMinTemp = ROOT.Double()
+
+        gr.ComputeRange(xMinTemp, yMinTemp, xMaxTemp, yMaxTemp)
+
+        if xMaxTemp > xMax: xMax = xMaxTemp
+        if xMinTemp < xMin: xMin = xMinTemp
+        if yMaxTemp > yMax: yMax = yMaxTemp
+        if yMinTemp < yMin: yMin = yMinTemp
+
+        hCfg["_graph"] = gr
+        
+        file.Close()
+
+    try:
+        myTH.GetXaxis().SetTitle(cCfg["xTitle"])
+    except KeyError:
+        pass
+    try:
+        myTH.GetYaxis().SetTitle(cCfg["yTitle"])
+    except KeyError:
+        pass
+    try:
+        myTH.SetTitle(cCfg["title"])
+    except KeyError:
+        pass
+
+    if "xRange" not in cCfg.keys():
+        cCfg["xRange"] = [ 1.1*xMin, 1.1*xMax ]
+    else:
+        if cCfg["xRange"][0] > cCfg["xRange"][1]:
+            cCfg["xRange"].reverse()
+    myTH.GetXaxis().SetRangeUser(cCfg["xRange"][0], cCfg["xRange"][1])
+    if "yRange" not in cCfg.keys():
+        cCfg["yRange"] = [ 1.1*yMin, 1.1*yMax ]
+    else:
+        if cCfg["yRange"][0] > cCfg["yRange"][1]:
+            cCfg["yRange"].reverse()
+    myTH.GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
+
+    # Time to draw!
+    myTH.Draw()
+    for gr in cCfg["graphs"]:
+        gr["_graph"].Draw(gr["style"])
+    myLeg.Draw("same")
+
+    return myCnv
 
 def drawTGraphCanvas(cCfg):
     # Create Canvas (title optional)
