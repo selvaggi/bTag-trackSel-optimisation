@@ -4,8 +4,8 @@ from tools.drawCanvas import drawCanvas
 
 # General configuration
 runCfg = {
-        "outFile": "testPlotHistos.root",
-        "printDir": "./plots", # optional
+        "outFile": "jetPlots.root",
+        "printDir": "./jetPlots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
@@ -17,10 +17,10 @@ canvasCfg = []
 ###### TCHE ##########################
 myTH1s = [
         {   
-            "file": "../myTrees/jetHistos_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets/TCHE", # name/path/... of the graph inside the file
-            "name": "B-jets", # name to be used in the legend
-            "color": ROOT.kRed,
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetHistos_TC_btagCutsOnly.root", # file where the graph is stored
+            "key": "Bjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
+            "name": "bTag cuts", # name to be used in the legend
+            "color": ROOT.kBlue,
             "lineStyle": 1, # (default 1)
             "lineWidth": 3, # (default 1)
         },

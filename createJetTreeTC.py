@@ -15,7 +15,7 @@ trackCut = [ # bTag current selection
     ( "Track_pt", gt, 1 ),
     ( "Track_chi2", lt, 5 ),
     ( "Track_zIP", lt, 17 ), ( "Track_zIP", gt, -17 ),
-    ( "Track_length", lt, 50 ),
+    ( "Track_length", lt, 5 ),
     ( "Track_dist", lt, 0.07 )
 ]
 # Failed try: we cannot use TTreeFormula, because what we access is not

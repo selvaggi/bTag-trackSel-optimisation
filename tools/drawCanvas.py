@@ -185,6 +185,12 @@ def drawTH1Canvas(cCfg):
         # Add to the legend
         myLeg.AddEntry(hist, hCfg["name"], "L")
 
+        # Rebin if asked
+        try:
+            hist.Rebin(hCfg["rebin"])
+        except KeyError:
+            pass
+
         # Retrieve x and y range
         xMaxTemp = hist.GetXaxis().GetXmax()
         xMinTemp = hist.GetXaxis().GetXmin()
@@ -412,16 +418,16 @@ def defineLegend(edge, nentries):
 
     if "l" in edge:
         xMin = 0.15
-        xMax = 0.35
+        xMax = 0.45
     if "r" in edge:
-        xMin = 0.75
+        xMin = 0.55
         xMax = 0.95
     if "t" in edge:
-        yMin = 0.85 - 0.065*nentries
+        yMin = 0.85 - 0.07*nentries
         yMax = 0.87
     if "b" in edge:
         yMin = 0.15
-        yMax = 0.15 + 0.065*nentries
+        yMax = 0.15 + 0.07*nentries
 
     return ROOT.TLegend(xMin, yMin, xMax, yMax)
 
