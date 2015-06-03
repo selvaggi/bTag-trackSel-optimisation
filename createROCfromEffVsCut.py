@@ -1,7 +1,11 @@
 from tools.trackCounting import createROCfromEffVsCutCurves
 
-inFile = "../myTrees/jetHistos_TC_btagCuts_MLP_Nplus5_noSel.root"
-outFile = "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root"
+#inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetROC_TC_btagCutsOnly.root"
+
+inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root"
+
 sigCat = "Bjets"
 bkgCats = ["Cjets", "Lightjets", "PUjets"]
 discriminants = ["Jet_Ip_DiscrEff", "TCHE_DiscrEff", "TCHP_DiscrEff"]
