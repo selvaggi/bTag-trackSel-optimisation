@@ -6,17 +6,20 @@ gROOT.SetBatch()
 
 patternDirectory = "./SIGTrackTree_SELTrackSel.root"
 trackSelection = "no"
-sample1 = "bkg"
-sample2 = "sig"  # will be in red
+sample1 = "sig"
+sample2 = "bkg"  # will be in red
 treeName = "trackTree"
 doPTreweight = True
+
+File1 = patternDirectory.replace("SIG",sample1).replace("SEL",trackSelection)
+File2 = patternDirectory.replace("SIG",sample2).replace("SEL",trackSelection)
 
 yAxisLabel = "Arbitrary Scale"
 leftText = "Tracks from PU vs tracks from b-jets, #sqrt{s}=13 TeV"
 rightText = ""
 format = "png"
 outputDirectory = "./bkgTrackvsSigTrack_noSelection/"
-outFile = outputDirectory+"/compare_"+sample1+"_"+sample2+"_trackVariables.root"
+outFile = outputDirectory+"/compare_"+sample1+"_"+sample2+"_trackVariables"+trackSelection+"TrackSel.root"
 
 if not os.path.exists(outputDirectory) :
     os.system("mkdir "+outputDirectory)
@@ -47,8 +50,6 @@ Vars = {
 dict_histo1 = {var:TH1D(var+"1",var+"1",Vars[var]["bin"],Vars[var]["xmin"],Vars[var]["xmax"]) for var in Vars}
 dict_histo2 = {var:TH1D(var+"2",var+"2",Vars[var]["bin"],Vars[var]["xmin"],Vars[var]["xmax"]) for var in Vars}
 
-File1 = patternDirectory.replace("SIG",sample1).replace("SEL",trackSelection)
-File2 = patternDirectory.replace("SIG",sample2).replace("SEL",trackSelection)
 
 rootFile1 = TFile(File1,"read")
 tree1 = rootFile1.Get(treeName)
@@ -68,9 +69,12 @@ for entry in xrange(tree2.GetEntries()) :
         dict_histo2[var].Fill(getattr(tree2,Vars[var]["name"]))
 
 
-for var in Vars.keys() : 
-    dict_histo2[var].SetLineColor(kRed)
+myBTGstyle()
 
+for var in Vars.keys() : 
+    dict_histo1[var].SetLineWidth(2)
+    dict_histo2[var].SetLineWidth(2)
+    dict_histo2[var].SetLineColor(ROOT.kRed)
     try : 
         dict_histo1[var].Scale(1./float(dict_histo1[var].Integral()))
         dict_histo2[var].Scale(1./float(dict_histo2[var].Integral()))
@@ -79,8 +83,8 @@ for var in Vars.keys() :
         print dict_histo1[var].Integral()
         print dict_histo2[var].Integral()
     leg = TLegend(0.61,0.67,0.76,0.82)
-    leg.AddEntry(dict_histo1[var],sample1)
-    leg.AddEntry(dict_histo2[var],sample2)
+    leg.AddEntry(dict_histo1[var],"b-jet Tracks")
+    leg.AddEntry(dict_histo2[var],"PU Tracks")
     leg.SetFillColor(0)
     leg.SetLineColor(0)
 
