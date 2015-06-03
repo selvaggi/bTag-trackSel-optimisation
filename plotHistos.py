@@ -24,6 +24,14 @@ myTH1s = [
             "lineStyle": 1, # (default 1)
             "lineWidth": 3, # (default 1)
         },
+        {   
+            "file": "../myTrees/jetHistos_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
+            "key": "Lightjets/TCHE", # name/path/... of the graph inside the file
+            "name": "Lightjets", # name to be used in the legend
+            "color": ROOT.kBlue,
+            "lineStyle": 1, # (default 1)
+            "lineWidth": 3, # (default 1)
+        },
     ]
 
 # The first canvas
@@ -32,11 +40,11 @@ myCanvas = {
         "xSize": 800,
         "ySize": 600,
         "title": "TCHE discriminant", # optional
-        "xRange": [0,1], # optional
         "norm": True, # optional
         "grid": "xy", # optional
         "xTitle": "TCHE", # optional
         "yTitle": "Arbitrary scale", # optional
+        "legPos": "bl", # t/b, l/r
         "hists": myTH1s,
     }
 canvasCfg.append(myCanvas)

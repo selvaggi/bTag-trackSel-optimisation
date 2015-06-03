@@ -1,7 +1,7 @@
 import copy
 import ROOT
 
-from tools.drawCanvas import drawTGraphs
+from tools.drawCanvas import drawCanvas
 
 # "Aliases"
 
@@ -113,6 +113,7 @@ for discr in discriminants:
                 "xSize": xSize,
                 "ySize": ySize,
                 "title": discr["title"] + " " + flav["title"],
+                "legPos": "tl", # t/b, l/r
                 "xRange": xRange, # optional
                 "yRange": yRange, # optional
                 "grid": grid, # optional
@@ -126,5 +127,5 @@ for discr in discriminants:
 # We're all set!
 
 if __name__ == "__main__":
-    drawTGraphs(runCfg, canvasCfg)
+    drawCanvas(runCfg, canvasCfg, mode = "TGraph")
 
