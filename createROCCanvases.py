@@ -1,11 +1,87 @@
+import copy
 import ROOT
 
 from tools.drawCanvas import drawTGraphs
 
+# "Aliases"
+
+drawStyle = "AP"
+markerStyle = 24
+markerSize = 1.1
+lineStyle = 1
+lineWidth = 2
+
+grid = "xy"
+log = "y"
+xRange = [0,0.8]
+yRange = [10**-3, 1]
+xSize = 800
+ySize = 600
+
+flavours = [
+        {
+            "key": "Bjets_vs_Lightjets",
+            "filename": "Lightjets",
+            "title": "(light jets)",
+        },
+        {
+            "key": "Bjets_vs_Cjets",
+            "filename": "Cjets",
+            "title": "(c-jets)",
+        },
+        {
+            "key": "Bjets_vs_PUjets",
+            "filename": "PUjets",
+            "title": "(PU jets)",
+        },
+    ]
+
+cuts = [
+        {
+            "name": "bTag cuts", # for legend
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
+            "color": ROOT.kBlue,
+        },
+        {
+            "name": "Cuts + MVA>0.65",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT065.root",
+            "color": ROOT.kMagenta+1,
+        },
+        {
+            "name": "Cuts + MVA>0.7",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT07.root",
+            "color": ROOT.kGreen+1,
+        },
+        {
+            "name": "Cuts + MVA>0.75",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root",
+            "color": ROOT.kOrange,
+        },
+        {
+            "name": "Cuts + MVA>0.8",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT08.root",
+            "color": ROOT.kRed,
+            },
+
+    ]
+
+discriminants = [
+        {
+            "key": "TCHE_DiscrEff",
+            "filename": "TCHE",
+            "title": "TCHE performances",
+        },
+        {
+            "key": "TCHP_DiscrEff",
+            "filename": "TCHP",
+            "title": "TCHP performances",
+        },
+    ]
+
 # General configuration
 runCfg = {
-        "outFile": "testROCCanvas.root",
-        "printDir": "./plots", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA065_MVA07_MVA075_MVA08_test.root",
+        "printDir": "./btagCutsOnly_MVA066_MVA07_MVA075_MVA08_plots_test", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
@@ -13,111 +89,39 @@ runCfg = {
 # Will hold the canvases
 canvasCfg = []
 
-# The graphs we want to include in the first canvas
-###### TCHE ##########################
-myGraphs = [
-        {   
-            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets_vs_Lightjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
-            "name": "Light jets", # name to be used in the legend
-            "color": ROOT.kBlue,
-            "style": "AL",
-            "markerStyle": 20, # Only used if "P" in "style" (default 20)
-            "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 3, # (default 1)
-        },
-        {   
-            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets_vs_Cjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
-            "name": "C-jets", # name to be used in the legend
-            "color": ROOT.kGreen,
-            "style": "AL",
-            "markerStyle": 20, # Only used if "P" in "style" (default 20)
-            "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 3, # (default 1)
-        },
-        {   
-            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets_vs_PUjets/TCHE_DiscrEff", # name/path/... of the graph inside the file
-            "name": "PU-jets", # name to be used in the legend
-            "color": ROOT.kMagenta,
-            "style": "AL",
-            "markerStyle": 20, # Only used if "P" in "style" (default 20)
-            "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" or "C" in "style" (default 1)
-            "lineWidth": 3, # (default 1)
-        },
-    ]
+for discr in discriminants:
 
-# The first canvas
-myCanvas = {
-        "name": "TCHE", # Name of the canvas for the output ROOT/png/... files
-        "xSize": 800,
-        "ySize": 600,
-        "title": "TCHE performances", # optional
-        "xRange": [0,1], # optional
-        "yRange": [10**-2,1], # optional
-        "grid": "xy", # optional
-        "log": "y", # optional
-        "xTitle": "B-jet efficiency", # optional
-        "yTitle": "Background efficiency", # optional
-        "graphs": myGraphs,
-    }
-canvasCfg.append(myCanvas)
+    for flav in flavours:
 
-###### TCHP ##########################
+        myGraphs = []
+        for cut in cuts:
+            graphCfg = {   
+                    "file": cut["file"],
+                    "key": flav["key"] + "/" + discr["key"],
+                    "name": cut["name"],
+                    "color": cut["color"],
+                    "style": drawStyle,
+                    "markerStyle": markerStyle, # Only used if "P" in "style" (default 20)
+                    "markerSize": markerSize, # (default 1)
+                    "lineStyle": lineStyle, # Only used if "L" in "style" (default 1)
+                    "lineWidth": lineWidth, # (default 1)
+                }
+            myGraphs.append(graphCfg)
 
-myGraphs = [
-        {   
-            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets_vs_Lightjets/TCHP_DiscrEff", # name/path/... of the graph inside the file
-            "name": "Light jets", # name to be used in the legend
-            "color": ROOT.kBlue,
-            "style": "AL",
-            "markerStyle": 20, # Only used if "P" in "style" (default 20)
-            "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 3, # (default 1)
-        },
-        {   
-            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets_vs_Cjets/TCHP_DiscrEff", # name/path/... of the graph inside the file
-            "name": "C-jets", # name to be used in the legend
-            "color": ROOT.kGreen,
-            "style": "AL",
-            "markerStyle": 20, # Only used if "P" in "style" (default 20)
-            "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" in "style" (default 1)
-            "lineWidth": 3, # (default 1)
-        },
-        {   
-            "file": "../myTrees/jetROC_TC_btagCuts_MLP_Nplus5_noSel.root", # file where the graph is stored
-            "key": "Bjets_vs_PUjets/TCHP_DiscrEff", # name/path/... of the graph inside the file
-            "name": "PU-jets", # name to be used in the legend
-            "color": ROOT.kMagenta,
-            "style": "AL",
-            "markerStyle": 20, # Only used if "P" in "style" (default 20)
-            "markerSize": 1.5, # (default 1)
-            "lineStyle": 1, # Only used if "L" or "C" in "style" (default 1)
-            "lineWidth": 3, # (default 1)
-        },
-    ]
-myCanvas = {
-        "name": "TCHP", # Name of the canvas for the output ROOT/png/... files
-        "xSize": 800,
-        "ySize": 600,
-        "title": "TCHP performances", # optional
-        "xRange": [0,1], # optional
-        "yRange": [10**-2,1], # optional
-        "grid": "xy", # optional
-        "log": "y", # optional
-        "xTitle": "B-jet efficiency", # optional
-        "yTitle": "Background efficiency", # optional
-        "graphs": myGraphs,
-        }
-canvasCfg.append(myCanvas)
+        myCanvas = {
+                "name": discr["filename"] + "_" + flav["filename"], # Name of the canvas for the output ROOT/png/... files
+                "xSize": xSize,
+                "ySize": ySize,
+                "title": discr["title"] + " " + flav["title"],
+                "xRange": xRange, # optional
+                "yRange": yRange, # optional
+                "grid": grid, # optional
+                "log": log, # optional
+                "xTitle": "B-jet efficiency", # optional
+                "yTitle": "Background efficiency", # optional
+                "graphs": myGraphs,
+            }
+        canvasCfg.append(myCanvas)
 
 # We're all set!
 
