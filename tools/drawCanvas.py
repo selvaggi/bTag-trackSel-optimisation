@@ -71,6 +71,8 @@ def drawTGraphs(runCfg, drawCfg):
             ROOT.gROOT.SetBatch(ROOT.kTRUE)
     except KeyError:
         pass
+    
+    myBTGStyle() # global variables powaaaa
 
     for canvasCfg in drawCfg:
         print "Drawing canvas {}.".format(canvasCfg["name"])
@@ -108,8 +110,6 @@ def drawTGraphs(runCfg, drawCfg):
         outFile.Close()
 
 def drawTGraphCanvas(cCfg):
-    myBTGStyle() # global variables powaaaa
-
     # Create Canvas (title optional)
     try:
         title = cCfg["title"]
@@ -135,7 +135,8 @@ def drawTGraphCanvas(cCfg):
     except KeyError:
         pass
 
-    myLeg = ROOT.TLegend(0.15, 0.85-0.065*len(cCfg["graphs"]), 0.35, 0.87) # To be tuned
+    #myLeg = ROOT.TLegend(0.15, 0.85-0.065*len(cCfg["graphs"]), 0.35, 0.87) # To be tuned
+    myLeg = ROOT.TLegend(0.75, 0.15, 0.95, 0.15+0.065*len(cCfg["graphs"])) # To be tuned
     # We need to keep track of ALL the objects created here, otherwise they will be deleted
     # when the function end and the TCanvas will end up containing only the TGraphs (and not the legend, ...)
     cCfg["_legend"] = myLeg
