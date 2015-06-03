@@ -47,6 +47,10 @@ Vars = {
     
 }
 
+#producedVars = { "Track_jet_DR" : {"name" : "Track_jet_DR", "title" : "Track_jet_DR", "bin" : 20, "xmin" : 0, "xmax" : 0.6 }
+#dict_producedHisto1 = {var:TH1D(var+"1",var+"1",producedVars[var]["bin"],producedVars[var]["xmin"],producedVars[var]["xmax"]) for var in producedVars}
+#dict_producedHisto2 = {var:TH1D(var+"2",var+"2"produced,Vars[var]["bin"],producedVars[var]["xmin"],producedVars[var]["xmax"]) for var in producedVars}
+
 dict_histo1 = {var:TH1D(var+"1",var+"1",Vars[var]["bin"],Vars[var]["xmin"],Vars[var]["xmax"]) for var in Vars}
 dict_histo2 = {var:TH1D(var+"2",var+"2",Vars[var]["bin"],Vars[var]["xmin"],Vars[var]["xmax"]) for var in Vars}
 
@@ -69,7 +73,7 @@ for entry in xrange(tree2.GetEntries()) :
         dict_histo2[var].Fill(getattr(tree2,Vars[var]["name"]))
 
 
-myBTGstyle()
+myBTGStyle()
 
 for var in Vars.keys() : 
     dict_histo1[var].SetLineWidth(2)
