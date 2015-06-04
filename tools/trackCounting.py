@@ -99,6 +99,11 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
 
     nEntries = tree.GetEntries()
     print "Will loop over ", nEntries, " events."
+
+    nSelTracksB = 0
+    nTotTracksB = 0
+    nSelTracksPU = 0
+    nTotTracksPU = 0
     
     # Looping over events
     for entry in xrange(nEntries):
@@ -113,6 +118,10 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
 
             # Looping over tracks
             for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
+                if abs(tree.Jet_flavour[jetInd]) == 5 and tree.Jet_genpt[jetInd] >= 8:
+                    nTotTracksB += 1
+                if tree.Jet_genpt[jetInd] < 8:
+                    nTotTracksPU += 1
                 keepTrack = True
 
                 if myTrackCutSel is not None:
@@ -123,6 +132,10 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
                     keepTrack = keepTrack and myTrackMVASel.evaluate(tree, track)
                 if not keepTrack: continue
 
+                if abs(tree.Jet_flavour[jetInd]) == 5 and tree.Jet_genpt[jetInd] >= 8:
+                    nSelTracksB += 1
+                if tree.Jet_genpt[jetInd] < 8:
+                    nSelTracksPU += 1
                 # For selected tracks, store pair (track number, IPsig)
                 selTracks.append( (track, tree.__getattr__("Track_IPsig")[track]) )
 
@@ -147,6 +160,9 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
                 var[0] = tree.__getattr__(name)[jetInd]
 
             outTree.Fill()
+
+    print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB, nTotTracksB, float(100*nSelTracksB)/nTotTracksB)
+    print "PU track efficiency: {}/{} = {}%.".format(nSelTracksPU, nTotTracksPU, float(100*nSelTracksPU)/nTotTracksPU)
 
     outFile.cd()
     outTree.Write()

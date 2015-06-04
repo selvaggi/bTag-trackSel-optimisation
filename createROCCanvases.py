@@ -36,6 +36,30 @@ flavours = [
         },
     ]
 
+#cuts = [
+#        {
+#            "name": "Default cuts", # for legend
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
+#            "color": ROOT.kBlue,
+#        },
+#        {
+#            "name": "Default + MVA>0.67",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUT067.root",
+#            "color": ROOT.kMagenta+1,
+#        },
+#        {
+#            "name": "Default + MVA>0.73",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUT073.root",
+#            "color": ROOT.kGreen+1,
+#        },
+#        {
+#            "name": "Default + MVA>0.8",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUT080.root",
+#            "color": ROOT.kOrange,
+#        },
+#
+#    ]
+
 cuts = [
         {
             "name": "Default cuts", # for legend
@@ -43,25 +67,20 @@ cuts = [
             "color": ROOT.kBlue,
         },
         {
-            "name": "Default + MVA>0.65",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT065.root",
+            "name": "Default + MVA>0.55",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUT055.root",
             "color": ROOT.kMagenta+1,
         },
         {
             "name": "Default + MVA>0.7",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT07.root",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUT070.root",
             "color": ROOT.kGreen+1,
         },
         {
-            "name": "Default + MVA>0.75",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root",
+            "name": "Default + MVA>0.8",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUT080.root",
             "color": ROOT.kOrange,
         },
-        {
-            "name": "Default + MVA>0.8",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT08.root",
-            "color": ROOT.kRed,
-            },
 
     ]
 
@@ -80,8 +99,8 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA065_MVA07_MVA075_MVA08_test.root",
-        "printDir": "./btagCutsOnly_MVA066_MVA07_MVA075_MVA08_plots_test", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/bTag-trackSel-optimisation/btagCutsOnly_MVA055_MVA070_MVA080_test.root",
+        "printDir": "./btagCutsOnly_MVA055_MVA070_MVA080_plots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
