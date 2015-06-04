@@ -5,9 +5,13 @@ from tools.trackCounting import createDiscrHist
 #treeDirectory = "jetTree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
 
-rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root"]
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"
+
+rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"]
 treeDirectory = "jetTree"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"
 
 histList = []
 histList.append({
@@ -96,5 +100,12 @@ jetCutList.append({
     "cuts": "Jet_genpt < 8"
     })
 
+#cutList = ["0"]
+#cutList = ["067", "073", "080"]
+cutList = ["055", "070", "080"]
+
 if __name__ == "__main__":
-    createDiscrHist(rootFileNames, treeDirectory, outFile, histList, jetCutList)
+    for cut in cutList:
+        thisInFile = [ file.replace("VALUE", cut) for file in rootFileNames ]
+        thisOutFile = outFile.replace("VALUE", cut)
+        createDiscrHist(thisInFile, treeDirectory, thisOutFile, histList, jetCutList)
