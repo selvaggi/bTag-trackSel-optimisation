@@ -1,14 +1,12 @@
 from tools.crabOutAnalyzer import *
 import os
 
-# to do :  script de comparaison des info des track pour jet signaux et bkg
-
 
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
 rootFileNames = ["JetTree_phys14_1.root"]
 treeDirectory = "btagana/ttree"
 doPTreweight = True
-outRootFileName = "trackParametersComparison_QCD3050Muen_bJet_vs_jetPTlower8_SelectedTrack.root"
+outRootFileName = "trackParametersComparison_QCD3050Muen_bJet_vs_jetPTlower8_noTrackSel.root"
 
 TrackVars = { 
 

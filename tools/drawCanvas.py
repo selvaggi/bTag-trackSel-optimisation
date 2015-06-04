@@ -47,6 +47,8 @@ def drawDoublehisto(h1, h2, name, xlabel, ylabel, legend, leftText, rightText, f
 
 def printCanvas(canvas, name, format, directory):
     if format != "":
+        if not os.path.exists(directory) :
+                os.system("mkdir "+outputDirectory)
         outFile = os.path.join(directory, name) + "." + format
         canvas.Print(outFile)
 

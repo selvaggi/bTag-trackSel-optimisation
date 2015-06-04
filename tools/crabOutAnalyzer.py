@@ -4,7 +4,7 @@ import copy
 from array import array
 
 def isSelectedTrack(HitPix=2, HitAll=8, IP2D=0.2, Pt=1, Chi2=5, zIP=17, Length=5, Dist=0.07):  #default values are the value requested for selectedTrack in bTag code
-    return HitPix >= 2 and HitAll >= 8 and abs(IP2D) < 0.2 and Pt > 1 and Chi2 < 5 and abs(zIP) < 17 and Length < 5 and Dist < 0.07  # bTag current selection
+    return HitPix >= 2 and HitAll >= 8 and abs(IP2D) < 0.2 and Pt > 1 and Chi2 < 5 and abs(zIP) < 17 and Length < 5 and abs(Dist) < 0.07  # bTag current selection
     #return HitPix >= 1 and HitAll >= 6 and abs(IP2D) < 0.3 and Pt>0.5 and Chi2 < 7 and abs(zIP) < 20 and Length <6 and Dist < 0.1 # Looser selection
     #return Dist < 0.07    # Selection applied only on the "Jet vs track" variable
     #return True # no selection 
@@ -20,7 +20,7 @@ def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight,
     yAxisLabel = "Arbitrary Scale"
     leftText = "Phys14 QCD30-50 MuEnriched #sqrt{s}=13 TeV"
     rightText = ""
-    format=""
+    format="png"
     imageDirectory = "./images/"
 
     ROOT.gROOT.SetBatch()
@@ -199,10 +199,14 @@ def createTreeSigBkg(rootFiles, treeDirectory, trackVariablesToStore, outRootFil
         tree.GetEntry(entry)
         
         for jetInd in xrange(tree.nJet):
-            
+            #jet_4v = ROOT.TLorentzVector()
+            #jet_4v.SetPtEtaPhiM(tree.Jet_pt[jetInd], tree.Jet_eta[jetInd], tree.Jet_phi[jetInd], 0) # tree.Jet_mass[jetInd])
             if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
                 for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     nSigTrack_beforeSel += 1
+                    #track_4v = ROOT.TLorentzVector()
+                    #track_4v.SetPtEtaPhiE(tree.Track_pt[track], tree.Track_eta[track], tree.Track_phi[track], 0)# tree.Track_p[track])
+                    #jetTrack_DR = track_4v.DeltaR(jet_4v)
                     if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_zIP[track], tree.Track_length[track], tree.Track_dist[track]):
                         nSigTrack_afterSel += 1
                         for variable in dict_variableName_Leaves.keys() :

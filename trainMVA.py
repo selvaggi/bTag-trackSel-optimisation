@@ -1,13 +1,10 @@
 from tools.MVA_facilities import train_MVA
-#from createTrackTrees import TrackVars
-
-#HitPix >= 2 and HitAll>=8 and IP2D<0.2 and Pt>1 and Chi2 < 5 and ZIP < 17 and Length <50 and Dist < 0.07
 
 TrackVars_training = [
 
 #    "Track_zIP",
-#    "Track_length",
-#    "Track_dist",
+    "Track_length",
+    "Track_dist",
 #    "Track_IP2D",
     "Track_pt",
     "Track_chi2",
@@ -16,9 +13,14 @@ TrackVars_training = [
 
 ]
 
-trackSel =  "bTag_zIP"   #"no" , "bTag", "bTagLoosened", "dist"
+trackSel =  "bTag_zIP_abs"   #"no" , "bTag", "bTagLoosened", "dist"
 
-train_MVA("./bkgTrackTree_"+trackSel+"TrackSel.root", "./sigTrackTree_"+trackSel+"TrackSel.root", TrackVars_training, "BDT", trackSel+"Sel_ptChi2BothHits")
+absolutePath = "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation"
+bkgTree = absolutePath + "/bkgTrackTree_"+trackSel+"TrackSel.root"
+sigTree = absolutePath + "/sigTrackTree_"+trackSel+"TrackSel.root"
+
+
+train_MVA(bkgTree, sigTree, TrackVars_training, "CUT", trackSel+"Sel_lengthDistptChi2BothHits")  
 
 
 

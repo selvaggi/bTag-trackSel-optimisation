@@ -5,7 +5,7 @@ storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-3
 rootFileNames = ["JetTree_phys14_1.root"]
 treeDirectory = "btagana/ttree"
 doPTreweight = True
-trackSelection = "bTag_zIP"    #"bTagLoosened", "no", "dist", "bTag"
+trackSelection = "bTag_zIP_abs"    #"bTagLoosened", "no", "dist", "bTag"
 outFileSig = "sigTrackTree_"+trackSelection+"TrackSel.root"
 outFileBkg = "bkgTrackTree_"+trackSelection+"TrackSel.root"
 
