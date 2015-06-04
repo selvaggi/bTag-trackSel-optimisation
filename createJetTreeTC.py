@@ -11,11 +11,11 @@ outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP
 trackCut = [ # bTag current selection
     ( "Track_nHitPixel", geq, 2 ),
     ( "Track_nHitAll", geq, 8 ),
-    ( "Track_IP2D", lt, 0.2 ),
+    ( "Track_IP2D", lt, 0.2 ), ( "Track_IP2D", gt, -0.2 ),
     ( "Track_pt", gt, 1 ),
     ( "Track_chi2", lt, 5 ),
-    ( "Track_zIP", lt, 17 ),
-    ( "Track_length", lt, 50 ),
+    ( "Track_zIP", lt, 17 ), ( "Track_zIP", gt, -17 ),
+    ( "Track_length", lt, 5 ),
     ( "Track_dist", lt, 0.07 )
 ]
 # Failed try: we cannot use TTreeFormula, because what we access is not

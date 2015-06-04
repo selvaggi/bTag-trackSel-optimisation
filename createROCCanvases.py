@@ -1,13 +1,13 @@
 import copy
 import ROOT
 
-from tools.drawCanvas import drawTGraphs
+from tools.drawCanvas import drawCanvas
 
 # "Aliases"
 
 drawStyle = "AP"
 markerStyle = 24
-markerSize = 1.1
+markerSize = 1.35
 lineStyle = 1
 lineWidth = 2
 
@@ -38,27 +38,27 @@ flavours = [
 
 cuts = [
         {
-            "name": "bTag cuts", # for legend
+            "name": "Default cuts", # for legend
             "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
             "color": ROOT.kBlue,
         },
         {
-            "name": "Cuts + MVA>0.65",
+            "name": "Default + MVA>0.65",
             "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT065.root",
             "color": ROOT.kMagenta+1,
         },
         {
-            "name": "Cuts + MVA>0.7",
+            "name": "Default + MVA>0.7",
             "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT07.root",
             "color": ROOT.kGreen+1,
         },
         {
-            "name": "Cuts + MVA>0.75",
+            "name": "Default + MVA>0.75",
             "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root",
             "color": ROOT.kOrange,
         },
         {
-            "name": "Cuts + MVA>0.8",
+            "name": "Default + MVA>0.8",
             "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT08.root",
             "color": ROOT.kRed,
             },
@@ -113,6 +113,7 @@ for discr in discriminants:
                 "xSize": xSize,
                 "ySize": ySize,
                 "title": discr["title"] + " " + flav["title"],
+                "legPos": "br", # t/b, l/r
                 "xRange": xRange, # optional
                 "yRange": yRange, # optional
                 "grid": grid, # optional
@@ -126,5 +127,5 @@ for discr in discriminants:
 # We're all set!
 
 if __name__ == "__main__":
-    drawTGraphs(runCfg, canvasCfg)
+    drawCanvas(runCfg, canvasCfg, mode = "TGraph")
 
