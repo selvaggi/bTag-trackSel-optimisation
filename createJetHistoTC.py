@@ -1,9 +1,13 @@
 import os
 from tools.trackCounting import createDiscrHist
 
-rootFileNames = ["../myTrees/jetTree_TC_btagCuts_MLP_Nplus5_noSel.root"]
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetTree_TC_btagCutsOnly.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
+
+rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root"]
 treeDirectory = "jetTree"
-outFile = "../myTrees/jetHistos_TC_btagCuts_MLP_Nplus5_noSel.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUT075.root"
 
 histList = []
 histList.append({
@@ -17,15 +21,15 @@ histList.append({
     "var": "Jet_ntracks",
     "name": "Jet_ntracks",
     "title": "Jet number of tracks",
-    "bins": 35,
-    "range": [0,35],
+    "bins": 40,
+    "range": [0,40],
     })
 histList.append({
     "var": "Jet_nseltracks",
     "name": "Jet_nseltracks",
     "title": "Jet number of selected tracks",
-    "bins": 15,
-    "range": [0,15],
+    "bins": 20,
+    "range": [0,20],
     })
 histList.append({
     "var": "Jet_Ip",
@@ -53,24 +57,24 @@ histList.append({
     "var": "Jet_Ip",
     "name": "Jet_Ip_DiscrEff",
     "title": "Jet first track IP sig.",
-    "bins": 2000,
-    "range": [-5,15],
+    "bins": 100,
+    "range": [-5,20],
     "discreff": True
     })
 histList.append({
     "var": "TCHE",
     "name": "TCHE_DiscrEff",
     "title": "Jet TCHE",
-    "bins": 2000,
-    "range": [-5,15],
+    "bins": 100,
+    "range": [-5,20],
     "discreff": True
     })
 histList.append({
     "var": "TCHP",
     "name": "TCHP_DiscrEff",
     "title": "Jet TCHP",
-    "bins": 2000,
-    "range": [-5,15],
+    "bins": 100,
+    "range": [-5,20],
     "discreff": True
     })
 
