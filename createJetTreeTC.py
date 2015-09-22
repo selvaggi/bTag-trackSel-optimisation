@@ -27,7 +27,7 @@ trackCut = "Track_nHitPixel >= 2 && Track_nHitAll >= 8 && abs(Track_IP2D) < 0.2 
 # Variables used by TMVA
 # Caution! Needs to be same order as when the MVA was trained! (thank you TMVA)
 trackMVAVars = [
-    "log(abs(Track_dz))",
+    "Track_dz",
     "Track_length",
     "Track_dist",
     "Track_IP2D",
@@ -48,16 +48,16 @@ trackMVA = {
         #"name": "800_track_hist_BfrombVSFake_noSel_allVar",
         
         ## bTag selection
-        #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_bTagSel_allVar.weights.xml",
-        #"name": "BDT_800_track_hist_BfrombVSFake_bTagSel_allVar",
+        "path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_bTagSel_allVar.weights.xml",
+        "name": "BDT_800_track_hist_BfrombVSFake_bTagSel_allVar",
 
         ## loosened bTag selection
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_bTagLoosenedSel_allVar.weights.xml",
         #"name": "BDT_800_track_hist_BfrombVSFake_bTagLoosenedSel_allVar",
         
         ## No selection, Log(dz)
-        "path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_noSel_allVarLogdz.weights.xml",
-        "name": "800_track_hist_BfrombVSFake_noSel_allVarLogdz",
+        #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_noSel_allVarLogdz.weights.xml",
+        #"name": "800_track_hist_BfrombVSFake_noSel_allVarLogdz",
 
         ## bTag selection, Log(dz)
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_bTagSel_allVarLogdz.weights.xml",
@@ -71,13 +71,13 @@ trackMVA = {
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_trackFrombJetVStrackNonbJet_noSel_allVar.weights.xml",
         #"name": "BDT_800_track_hist_trackFrombJetVStrackNonbJet_noSel_allVar",
         
-        "cut": 0,
+        "cuts": [ -0.2, -0.16, -0.1, -0.075 ],
         "vars": trackMVAVars
         }
 
-cutList = {
-        "no Cut": 0,
-    }
+#cutList = {
+#        "no Cut": 0,
+#    }
 
 #cutList = {
 #        "067": 0.67,
@@ -99,12 +99,12 @@ cutList = {
 #    }
 
 ## No selection, Log(dz)
-cutList = {
-        "-005": -0.05,
-        "-006": -0.06,
-        "-007": -0.07,
-        "-009": -0.09
-    }
+#cutList = {
+#        "-005": -0.05,
+#        "-006": -0.06,
+#        "-007": -0.07,
+#        "-009": -0.09
+#    }
 
 ## bTag selection
 #cutList = {
@@ -140,8 +140,8 @@ cutList = {
 if __name__ == "__main__":
     fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
 
-    for cut in cutList.keys():
-        trackMVA["cut"] = cutList[cut]
-        thisOutFile = outFile.replace("VALUE", cut)
-        print "For cut value {}:".format(cutList[cut])
-        createJetTreeTC(fileList, treeDirectory, thisOutFile, trackCut=None, trackMVA=trackMVA)
+    #for cut in cutList.keys():
+    #    trackMVA["cuts"] = cutList[cut]
+    #    thisOutFile = outFile.replace("VALUE", cut)
+    #    print "For cut value {}:".format(cutList[cut])
+    createJetTreeTC(fileList, treeDirectory, outFile, trackCut=trackCut, trackMVA=trackMVA)

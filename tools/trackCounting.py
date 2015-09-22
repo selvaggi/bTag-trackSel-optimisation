@@ -21,15 +21,15 @@ class trackCutSelector:
     def evaluate(self, tree, trackN):
         # Important otherwise the vector is not loaded correctly
         self.formula.GetNdata()
-        return self.formula.EvalInstance(trackN)
+        return self.formula.EvalInstance(trackN) 
 
 class trackMVASelector:
     """ Using the BTagAnalyzer tree and track number, check whether track is selected by MVA or not. """
     
-    def __init__(self, tree, path, name, cut, trackVars):
+    def __init__(self, tree, path, name, cuts, trackVars):
         self.name = name
         self.path = path
-        self.cut = cut
+        self.cuts = cuts
         self.reader = ROOT.TMVA.Reader()
         
         # We cannot use a dict to hold the variables since TMVA cares about the order of the variables
@@ -45,6 +45,7 @@ class trackMVASelector:
 
     def sync(self, tree, trackN):
         for var in self.trackVars:
+            #print "Evaluating formula {} which has {} entries".format(var[0], self.trackVarFormulas[var[0]].GetNdata())
             self.trackVarFormulas[var[0]].GetNdata()
             var[1][0] = self.trackVarFormulas[var[0]].EvalInstance(trackN)
 
@@ -53,7 +54,11 @@ class trackMVASelector:
         return self.reader.EvaluateMVA(self.name)
 
     def evaluate(self, tree, trackN):
-        return self.getValue(tree, trackN) > self.cut
+        results = []
+        mvaValue = self.getValue(tree, trackN) 
+        for cut in self.cuts:
+            results.append( mvaValue > cut )
+        return results
 
 
 
@@ -61,13 +66,10 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
     """ Create TTree containing info about the jets.
     The tracks in the jets are selected either using cuts, or a MVA, or both.
     Only jets with at least one track are kept.
-    For each jet, the number of selected tracks, and the jet IPsig, TCHE, and TCHP values are stored."""
+    For each jet, the number of selected tracks, and the jet IPsig, TCHE, and TCHP values are stored as vectors (one entry per cut on the MVA)."""
 
     tree = ROOT.TChain(treeDirectory)
     for file in rootFiles:
-        if not os.path.isfile(file):
-            print "Error: file {} does not exist.".format(file)
-            sys.exit(1)
         tree.Add(file)
 
     outFile = ROOT.TFile(outFileName, "recreate")
@@ -77,34 +79,48 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
     copiedVariablesToStore = ["Jet_genpt", "Jet_pt", "Jet_ntracks", "Jet_eta", "Jet_phi", "Jet_flavour"]
     copiedVariables = { name: array("d", [0]) for name in copiedVariablesToStore }
 
-    # The variables that we compute here and store in the output tree
-    outVariablesToStore = ["Jet_nseltracks", "Jet_Ip", "TCHE", "TCHP"]
-    outVariables = { name: array("d", [0]) for name in outVariablesToStore }
-    
-    for name, var in copiedVariables.items() + outVariables.items():
+    for name, var in copiedVariables.items():
         outTree.Branch(name, var, name + "/D")
+    
+    # The variables that we compute here and store in the output tree
+    nCuts = 1
+    outVariablesToStore = ["Jet_nseltracks", "Jet_Ip", "TCHE", "TCHP"]
+    outVariables = { name: ROOT.std.vector(float)() for name in outVariablesToStore }
+    
+    for name, var in outVariables.items():
+        outTree.Branch(name, var)
 
+    print ""
+    
     # Create a trackCutSelector to select tracks using cuts
     myTrackCutSel = None
     if trackCut is not None:
+        print "Will use base rectangular cuts: {}".format(trackCut)
         myTrackCutSel = trackCutSelector(tree, trackCut)
 
     # Create a trackMVASelector to select tracks using the MVA output
     myTrackMVASel = None
     if trackMVA is not None:
         if not os.path.isfile(trackMVA["path"]):
-            print "Error: file {} does not exist.".format(trackMVA["path"])
-            sys.exit(1)
-        myTrackMVASel = trackMVASelector(tree, trackMVA["path"], trackMVA["name"], trackMVA["cut"], trackMVA["vars"])
+            raise Exception("Error: file {} does not exist.".format(trackMVA["path"]))
+        print "Will use MVA-based track selector {} on cut values {}.\n".format(trackMVA["name"], trackMVA["cuts"])
+        myTrackMVASel = trackMVASelector(tree, trackMVA["path"], trackMVA["name"], trackMVA["cuts"], trackMVA["vars"])
+        nCuts = len(trackMVA["cuts"])
 
+    print ""
+    
     nEntries = tree.GetEntries()
     print "Will loop over ", nEntries, " events."
 
-    nSelTracksB = 0
-    nTotTracksB = 0
-    nSelTracksPU = 0
-    nTotTracksPU = 0
-    
+    nSelTracksB     = [0]*nCuts
+    nTotTracksB     = 0
+    nSelTracksLight = [0]*nCuts
+    nTotTracksLight = 0
+    nSelTracksC     = [0]*nCuts
+    nTotTracksC     = 0
+    nSelTracksPU    = [0]*nCuts
+    nTotTracksPU    = 0
+
     # Looping over events
     for entry in xrange(nEntries):
         if (entry+1) % 1000 == 0:
@@ -113,56 +129,92 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
 
         # Looping over jets
         for jetInd in xrange(tree.nJet):
+            #print "Starting jet which has tracks {}...{}".format(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd])
 
-            selTracks = []
+            selTracks = [ [] for i in xrange(nCuts) ]
 
             # Looping over tracks
             for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
-                if abs(tree.Jet_flavour[jetInd]) == 5 and tree.Jet_genpt[jetInd] >= 8:
-                    nTotTracksB += 1
-                if tree.Jet_genpt[jetInd] < 8:
+                #print "Analyzing track {}".format(track)
+                if tree.Jet_genpt[jetInd] >= 8:
+                    if abs(tree.Jet_flavour[jetInd]) == 5:
+                        nTotTracksB += 1
+                    if abs(tree.Jet_flavour[jetInd]) == 4:
+                        nTotTracksC += 1
+                    if abs(tree.Jet_flavour[jetInd]) < 4 or tree.Jet_flavour[jetInd] == 21:
+                        nTotTracksLight += 1
+                else:
                     nTotTracksPU += 1
-                keepTrack = True
+                
+                keepTrack = [ True for i in xrange(nCuts) ]
 
                 if myTrackCutSel is not None:
-                    keepTrack = keepTrack and myTrackCutSel.evaluate(tree, track)
-                if not keepTrack: continue
+                    cutResult = myTrackCutSel.evaluate(tree, track)
+                    keepTrack = [ x and cutResult for x in keepTrack ]
+                if not any(keepTrack): continue
 
                 if myTrackMVASel is not None:
-                    keepTrack = keepTrack and myTrackMVASel.evaluate(tree, track)
-                if not keepTrack: continue
+                    keepTrack = [ x and y for (x,y) in zip(keepTrack, myTrackMVASel.evaluate(tree, track)) ]
+                if not any(keepTrack): continue
 
-                if abs(tree.Jet_flavour[jetInd]) == 5 and tree.Jet_genpt[jetInd] >= 8:
-                    nSelTracksB += 1
-                if tree.Jet_genpt[jetInd] < 8:
-                    nSelTracksPU += 1
-                # For selected tracks, store pair (track number, IPsig)
-                selTracks.append( (track, tree.Track_IPsig[track]) )
+                for i in xrange(nCuts):
+                    if keepTrack[i]:
+                        if tree.Jet_genpt[jetInd] >= 8:
+                            if abs(tree.Jet_flavour[jetInd]) == 5:
+                                nSelTracksB[i] += 1
+                            if abs(tree.Jet_flavour[jetInd]) == 4:
+                                nSelTracksC[i] += 1
+                            if abs(tree.Jet_flavour[jetInd]) < 4 or tree.Jet_flavour[jetInd] == 21:
+                                nSelTracksLight[i] += 1
+                        else:
+                            nSelTracksPU[i] += 1
+                
+                        # For selected tracks, store pair (track number, IPsig)
+                        selTracks[i].append( (track, tree.Track_IPsig[track]) )
 
-            if len(selTracks) == 0: continue
+            #print "Analyzing jet on result:"
+            #print selTracks
 
-            outVariables["Jet_nseltracks"][0] = len(selTracks)
+            selectedJet = False
+            for i in xrange(nCuts):
+                if len(selTracks[i]):
+                    selectedJet = True
 
-            # Sort tracks according to decreasing IP significance
-            sorted(selTracks, reverse = True, key = lambda track: track[1])
+                    outVariables["Jet_nseltracks"].push_back(len(selTracks[i]))
 
-            # TCHE = IPsig of 2nd track, TCHP = IPsig of 3rd track (default to -10**10)
-            outVariables["Jet_Ip"][0] = selTracks[0][1]
-            outVariables["TCHE"][0] = -10**10
-            outVariables["TCHP"][0] = -10**10
-            if len(selTracks) > 1:
-                outVariables["TCHE"][0] = selTracks[1][1]
-            if len(selTracks) > 2:
-                outVariables["TCHP"][0] = selTracks[2][1]
+                    # Sort tracks according to decreasing IP significance
+                    sorted(selTracks[i], reverse = True, key = lambda track: track[1])
 
-            # Get value of the variables we simply copy
-            for name, var in copiedVariables.items():
-                var[0] = tree.__getattr__(name)[jetInd]
+                    # TCHE = IPsig of 2nd track, TCHP = IPsig of 3rd track (default to -10**10)
+                    outVariables["Jet_Ip"].push_back(selTracks[i][0][1])
+                    outVariables["TCHE"].push_back(-10**10)
+                    outVariables["TCHP"].push_back(-10**10)
+                    if len(selTracks[i]) > 1:
+                        outVariables["TCHE"][i] = selTracks[i][1][1]
+                    if len(selTracks[i]) > 2:
+                        outVariables["TCHP"][i] = selTracks[i][2][1]
+            
+            if selectedJet:
+                # Get value of the variables we simply copy
+                for name, var in copiedVariables.items():
+                    var[0] = tree.__getattr__(name)[jetInd]
 
-            outTree.Fill()
+                outTree.Fill()
 
-    print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB, nTotTracksB, float(100*nSelTracksB)/nTotTracksB)
-    print "PU track efficiency: {}/{} = {}%.".format(nSelTracksPU, nTotTracksPU, float(100*nSelTracksPU)/nTotTracksPU)
+            for var in outVariables.values():
+                var.clear()
+
+    print ""
+
+    for i in xrange(nCuts):
+        if trackMVA is not None:
+            print "MVA cut value {}:".format(trackMVA["cuts"][i])
+        else:
+            print "Non-MVA cuts:"
+        print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB[i], nTotTracksB, float(100*nSelTracksB[i])/nTotTracksB)
+        print "C track efficiency:  {}/{} = {}%.".format(nSelTracksC[i], nTotTracksC, float(100*nSelTracksC[i])/nTotTracksC)
+        print "Light track efficiency:  {}/{} = {}%.".format(nSelTracksLight[i], nTotTracksB, float(100*nSelTracksLight[i])/nTotTracksLight)
+        print "PU track efficiency: {}/{} = {}%.\n".format(nSelTracksPU[i], nTotTracksPU, float(100*nSelTracksPU[i])/nTotTracksPU)
 
     outFile.cd()
     outTree.Write()
