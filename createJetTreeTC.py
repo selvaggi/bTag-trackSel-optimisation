@@ -1,5 +1,4 @@
 import os
-from tools.trackCounting import gt, geq, lt, leq, eq, neq
 from tools.trackCounting import createJetTreeTC
 
 #storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
@@ -21,34 +20,7 @@ treeDirectory = "btagana/ttree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetTree_testFormulaMVA.root"
 
-## bTag current selection
-#trackCut = [ 
-#    ( "Track_nHitPixel", geq, 2 ),
-#    ( "Track_nHitAll", geq, 8 ),
-#    ( "Track_IP2D", lt, 0.2 ), ( "Track_IP2D", gt, -0.2 ),
-#    ( "Track_pt", gt, 1 ),
-#    ( "Track_chi2", lt, 5 ),
-#    ( "Track_dz", lt, 17 ), ( "Track_dz", gt, -17 ),
-#    #( "Track_zIP", lt, 17 ), ( "Track_zIP", gt, -17 ),
-#    ( "Track_length", lt, 5 ),
-#    ( "Track_dist", lt, 0.07 ), ( "Track_dist", gt, -0.07 )
-#]
-
-## bTag loosened selection
-#trackCut = [ 
-#    ( "Track_nHitPixel", geq, 0 ),
-#    ( "Track_nHitAll", geq, 0 ),
-#    ( "Track_IP2D", lt, 0.2 ), ( "Track_IP2D", gt, -0.2 ),
-#    ( "Track_pt", gt, 0 ),
-#    ( "Track_chi2", lt, 5 ),
-#    ( "Track_dz", lt, 17 ), ( "Track_dz", gt, -17 ),
-#    #( "Track_zIP", lt, 17 ), ( "Track_zIP", gt, -17 ),
-#    ( "Track_length", lt, 5 ),
-#    ( "Track_dist", lt, 0.07 ), ( "Track_dist", gt, -0.07 )
-#]
-
-# Failed try: we cannot use TTreeFormula, because what we access is not
-# Track_pt but Track_pt[tracknumber]. Any better solution?
+# bTag current selection
 trackCut = "Track_nHitPixel >= 2 && Track_nHitAll >= 8 && abs(Track_IP2D) < 0.2 && Track_pt > 1 && \
             Track_chi2 < 5 && abs(Track_dz) < 17 && Track_length < 5 && Track_dist < 0.07" # bTag current selection
 

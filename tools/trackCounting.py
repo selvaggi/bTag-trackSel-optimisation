@@ -10,13 +10,6 @@ import warnings
 # See https://root.cern.ch/phpBB3/viewtopic.php?f=14&t=14213
 warnings.filterwarnings(action='ignore', category=RuntimeWarning, message='creating converter.*')
 
-def gt(l, r): return l > r
-def geq(l, r): return l >= r
-def lt(l, r): return l < r
-def leq(l, r): return l <= r
-def eq(l, r): return l == r
-def neq(l, r): return l != r
-
 class trackCutSelector:
     """ Using the BTagAnalyzer tree and track number, check whether track passes cuts or not. """
 
