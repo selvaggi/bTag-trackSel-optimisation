@@ -1,17 +1,46 @@
 import os
 from tools.trackCounting import createDiscrHist
 
-#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetTree_TC_btagCutsOnly.root"]
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetTree_TC_btagCutsOnly.root"]
 #treeDirectory = "jetTree"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
+
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetTree_TC_loosenedbtagCutsOnly.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetHistos_TC_loosenedbtagCutsOnly.root"
 
 #rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"]
 #treeDirectory = "jetTree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"
 
-rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"]
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"
+
+## No selection
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+
+## bTag selection
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+
+## loosened bTag selection
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+
+## No bTag selection, trackFromBvsOther 
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+
+## No bTag selection, trackFromBjetvsOther 
+rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
 treeDirectory = "jetTree"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
 
 histList = []
 histList.append({
@@ -100,9 +129,14 @@ jetCutList.append({
     "cuts": "Jet_genpt < 8"
     })
 
-#cutList = ["0"]
+cutList = ["0"]
 #cutList = ["067", "073", "080"]
-cutList = ["055", "070", "080"]
+#cutList = ["055", "070", "080"]
+#cutList = ["-0065", "-0080", "-0100", "-0150"] # No selection
+#cutList = ["-020", "-016", "-010", "-0075"] # bTag selection
+#cutList = ["-005", "-0045", "-0033", "-0026"] # loosened bTag selection
+#cutList = ["-038", "-037", "-035"] # No selection, trackFromBvsOther 
+cutList = ["-0444", "-0440", "-0434", "-0430"] # No selection, trackFromBvsOther 
 
 if __name__ == "__main__":
     for cut in cutList:
