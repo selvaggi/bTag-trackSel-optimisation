@@ -20,33 +20,40 @@ def neq(l, r): return l != r
 class trackCutSelector:
     """ Using the BTagAnalyzer tree and track number, check whether track passes cuts or not. """
 
-    def __init__(self, cuts):
+    def __init__(self, tree, cuts):
         self.cuts = cuts
+        self.formula = ROOT.TTreeFormula("Cut_formula", cuts, tree)
+        tree.SetNotify(self.formula)
 
     def evaluate(self, tree, trackN):
-        for cut in self.cuts:
-            value = tree.__getattr__(cut[0])[trackN]
-            if not cut[1]( value, cut[2] ):
-                return False
-        return True
+        # Important otherwise the vector is not loaded correctly
+        self.formula.GetNdata()
+        return self.formula.EvalInstance(trackN)
 
 class trackMVASelector:
     """ Using the BTagAnalyzer tree and track number, check whether track is selected by MVA or not. """
     
-    def __init__(self, path, name, cut, trackVars):
+    def __init__(self, tree, path, name, cut, trackVars):
         self.name = name
         self.path = path
         self.cut = cut
         self.reader = ROOT.TMVA.Reader()
+        
         # We cannot use a dict to hold the variables since TMVA cares about the order of the variables
         self.trackVars = [ (name, array("f", [0])) for name in trackVars ]
         for var in self.trackVars:
             self.reader.AddVariable(var[0], var[1])
+        
+        self.trackVarFormulas = { name: ROOT.TTreeFormula(name, name, tree) for name in trackVars }
+        for formula in self.trackVarFormulas.values():
+            tree.SetNotify(formula)
+        
         self.reader.BookMVA(self.name, self.path)
 
     def sync(self, tree, trackN):
         for var in self.trackVars:
-            var[1][0] = tree.__getattr__(var[0])[trackN]
+            self.trackVarFormulas[var[0]].GetNdata()
+            var[1][0] = self.trackVarFormulas[var[0]].EvalInstance(trackN)
 
     def getValue(self, tree, trackN):
         self.sync(tree, trackN)
@@ -87,7 +94,7 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
     # Create a trackCutSelector to select tracks using cuts
     myTrackCutSel = None
     if trackCut is not None:
-        myTrackCutSel = trackCutSelector(trackCut)
+        myTrackCutSel = trackCutSelector(tree, trackCut)
 
     # Create a trackMVASelector to select tracks using the MVA output
     myTrackMVASel = None
@@ -95,7 +102,7 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
         if not os.path.isfile(trackMVA["path"]):
             print "Error: file {} does not exist.".format(trackMVA["path"])
             sys.exit(1)
-        myTrackMVASel = trackMVASelector(trackMVA["path"], trackMVA["name"], trackMVA["cut"], trackMVA["vars"])
+        myTrackMVASel = trackMVASelector(tree, trackMVA["path"], trackMVA["name"], trackMVA["cut"], trackMVA["vars"])
 
     nEntries = tree.GetEntries()
     print "Will loop over ", nEntries, " events."
@@ -137,7 +144,7 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
                 if tree.Jet_genpt[jetInd] < 8:
                     nSelTracksPU += 1
                 # For selected tracks, store pair (track number, IPsig)
-                selTracks.append( (track, tree.__getattr__("Track_IPsig")[track]) )
+                selTracks.append( (track, tree.Track_IPsig[track]) )
 
             if len(selTracks) == 0: continue
 
