@@ -56,9 +56,7 @@ class trackMVASelector:
     def evaluate(self, tree, trackN):
         results = []
         mvaValue = self.getValue(tree, trackN) 
-        for cut in self.cuts:
-            results.append( mvaValue > cut )
-        return results
+        return [ mvaValue > cut for cut in self.cuts ]
 
 
 

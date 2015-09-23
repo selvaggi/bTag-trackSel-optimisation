@@ -140,8 +140,4 @@ trackMVA = {
 if __name__ == "__main__":
     fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
 
-    #for cut in cutList.keys():
-    #    trackMVA["cuts"] = cutList[cut]
-    #    thisOutFile = outFile.replace("VALUE", cut)
-    #    print "For cut value {}:".format(cutList[cut])
     createJetTreeTC(fileList, treeDirectory, outFile, trackCut=trackCut, trackMVA=trackMVA)
