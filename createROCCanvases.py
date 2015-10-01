@@ -144,40 +144,6 @@ flavours = [
 #    ]
 
 ## loosened bTag Selection
-#cuts = [
-#        {
-#            "name": "Default cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-#            "color": ROOT.kBlue,
-#        },
-#        {
-#            "name": "Loosened cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetROC_TC_loosenedbtagCutsOnly.root",
-#            "color": ROOT.kRed,
-#        },
-#        {
-#            "name": "Loosened cuts + MVA>-0.05",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-005.root",
-#            "color": ROOT.kMagenta+1,
-#        },
-#        {
-#            "name": "Loosened cuts + MVA>-0.045",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0045.root",
-#            "color": ROOT.kGreen+1,
-#        },
-#        {
-#            "name": "Loosened cuts + MVA>-0.033",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0033.root",
-#            "color": ROOT.kOrange,
-#        },
-#        #{
-#        #    "name": "Loosened cuts + MVA>-0.026",
-#        #    "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0026.root",
-#        #    "color": ROOT.kRed,
-#        #}
-#    ]
-
-## loosened bTag Selection
 cuts = [
         {
             "name": "Default cuts", # for legend
@@ -190,26 +156,60 @@ cuts = [
             "color": ROOT.kRed,
         },
         {
-            "name": "MVA>-0.444",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0444.root",
+            "name": "Loosened cuts + MVA>-0.05",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-005.root",
             "color": ROOT.kMagenta+1,
         },
         {
-            "name": "MVA>-0.440",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0440.root",
+            "name": "Loosened cuts + MVA>-0.045",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0045.root",
             "color": ROOT.kGreen+1,
         },
         {
-            "name": "MVA>-0.434",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0434.root",
+            "name": "Loosened cuts + MVA>-0.033",
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0033.root",
             "color": ROOT.kOrange,
         },
-        {
-            "name": "MVA>-0.430",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0430.root",
-            "color": ROOT.kRed,
-        },
+        #{
+        #    "name": "Loosened cuts + MVA>-0.026",
+        #    "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0026.root",
+        #    "color": ROOT.kRed,
+        #}
     ]
+
+## loosened bTag Selection
+#cuts = [
+#        {
+#            "name": "Default cuts", # for legend
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
+#            "color": ROOT.kBlue,
+#        },
+#        {
+#            "name": "Loosened cuts", # for legend
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetROC_TC_loosenedbtagCutsOnly.root",
+#            "color": ROOT.kRed,
+#        },
+#        {
+#            "name": "MVA>-0.444",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0444.root",
+#            "color": ROOT.kMagenta+1,
+#        },
+#        {
+#            "name": "MVA>-0.440",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0440.root",
+#            "color": ROOT.kGreen+1,
+#        },
+#        {
+#            "name": "MVA>-0.434",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0434.root",
+#            "color": ROOT.kOrange,
+#        },
+#        {
+#            "name": "MVA>-0.430",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0430.root",
+#            "color": ROOT.kRed,
+#        },
+#    ]
 
 discriminants = [
         {
@@ -226,8 +226,8 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDT_trackFromBjetvsOther/performances.root",
-        "printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDT_trackFromBjetvsOther/plots", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDTloosenedbTagCuts/btagCutsOnly_BDTbTagCuts_-005_-0045_-0033_-0026.root",
+        "printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDTloosenedbTagCuts/plots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }

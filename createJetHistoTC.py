@@ -1,5 +1,5 @@
 import os
-from tools.trackCounting import createDiscrHist
+from tools.trackCounting import createDiscrHist, create2DDiscrHist
 
 #rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetTree_TC_btagCutsOnly.root"]
 #treeDirectory = "jetTree"
@@ -38,9 +38,13 @@ from tools.trackCounting import createDiscrHist
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
 
 ## No bTag selection, trackFromBjetvsOther 
-rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#treeDirectory = "jetTree"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+
+inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetTree_testFormulaMVA.root"
 treeDirectory = "jetTree"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetHisto_testFormulaMVA.root"
 
 histList = []
 histList.append({
@@ -136,10 +140,13 @@ cutList = ["0"]
 #cutList = ["-020", "-016", "-010", "-0075"] # bTag selection
 #cutList = ["-005", "-0045", "-0033", "-0026"] # loosened bTag selection
 #cutList = ["-038", "-037", "-035"] # No selection, trackFromBvsOther 
-cutList = ["-0444", "-0440", "-0434", "-0430"] # No selection, trackFromBvsOther 
+#cutList = ["-0444", "-0440", "-0434", "-0430"] # No selection, trackFromBvsOther 
+cutList = [ -0.2, -0.16, -0.1, -0.075 ]
 
-if __name__ == "__main__":
-    for cut in cutList:
-        thisInFile = [ file.replace("VALUE", cut) for file in rootFileNames ]
-        thisOutFile = outFile.replace("VALUE", cut)
-        createDiscrHist(thisInFile, treeDirectory, thisOutFile, histList, jetCutList)
+create2DDiscrHist(inFile, treeDirectory, outFile, histList, jetCutList, cutList)
+
+#if __name__ == "__main__":
+#    for cut in cutList:
+#        thisInFile = [ file.replace("VALUE", cut) for file in rootFileNames ]
+#        thisOutFile = outFile.replace("VALUE", cut)
+#        createDiscrHist(thisInFile, treeDirectory, thisOutFile, histList, jetCutList)

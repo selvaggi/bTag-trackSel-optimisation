@@ -3,7 +3,7 @@ from tools.trackCounting import createJetTreeTC
 
 #storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/trackOpti/QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50nsRecodebug_MCRUN2_74_V9A-v1_2015-06-19/150619_133609/0000"
-rootFileNames = [ "JetTree_mc_{}.root".format(i) for i in range(1, 2) ]
+rootFileNames = [ "JetTree_mc_{}.root".format(i) for i in range(1, 3) ]
 treeDirectory = "btagana/ttree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"
@@ -34,7 +34,7 @@ trackMVAVars = [
     "Track_pt",
     "Track_chi2",
     "Track_nHitPixel",
-    "Track_nHitAll",
+    "Track_nHitAll"
 ]
 
 trackMVA = {
@@ -71,7 +71,7 @@ trackMVA = {
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_trackFrombJetVStrackNonbJet_noSel_allVar.weights.xml",
         #"name": "BDT_800_track_hist_trackFrombJetVStrackNonbJet_noSel_allVar",
         
-        "cuts": [ -0.2, -0.16, -0.1, -0.075 ],
+        "cuts": [ -0.2, -0.19, -0.16, -0.14, -0.12, -0.1, -0.08, -0.06 ],
         "vars": trackMVAVars
         }
 
