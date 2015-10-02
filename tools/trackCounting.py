@@ -324,13 +324,13 @@ def create2DDiscrHist(inputFile, treeDirectory, outputFileName, histList, jetCat
                         if len(value) > 1:
                             for mvaCut in xrange( len(value) ):
                                 # We don't want to include the under/overflow:
-                                if value[mvaCut] >= histDict["range"][0] and value[mvaCut] < histDict["range"][1]:
-                                    histDict["categDict"][ cat["name"] ].Fill(value[mvaCut], mvaCut)
+                                #if value[mvaCut] >= histDict["range"][0] and value[mvaCut] < histDict["range"][1]:
+                                histDict["categDict"][ cat["name"] ].Fill(value[mvaCut], mvaCut)
                     except TypeError:
                         for mvaCut in xrange(nCuts):
                             # We don't want to include the under/overflow:
-                            if value >= histDict["range"][0] and value < histDict["range"][1]:
-                                histDict["categDict"][ cat["name"] ].Fill(value, mvaCut)
+                            #if value >= histDict["range"][0] and value < histDict["range"][1]:
+                            histDict["categDict"][ cat["name"] ].Fill(value, mvaCut)
 
     for cat in jetCategList:
         print "Total number of entries for category {}: {}.".format(cat["name"], cat["total"]) 
@@ -341,15 +341,25 @@ def create2DDiscrHist(inputFile, treeDirectory, outputFileName, histList, jetCat
         for histDict in histList:
             histDict["categDict"][ cat["name"] ].Write(histDict["name"])
 
-    # For those who asked it, create TGraph of eff. vs. cut value:
-    #for cat in jetCategList:
-    #    outFile.cd(cat["name"])
+    # For those who asked it, create TGraphAsymmErrors of eff. vs. cut value for each cut on the MVA:
+    for cat in jetCategList:
+        outFile.cd(cat["name"])
 
-    #    for histDict in histList:
-    #        if "discreff" in histDict.keys():
-    #            if histDict["discreff"] is True:
-    #                myGraph = drawEffVsCutCurve(myTH1 = histDict["categDict"][ cut["name"] ], total = cat["total"])
-    #                myGraph.Write(histDict["name"] + "_graph")
+        for histDict in histList:
+            if "discreff" in histDict.keys():
+                if histDict["discreff"] is True:
+                    
+                    myList = ROOT.TList()
+                    
+                    for i in range(nCuts):
+                        myEffGraph = createEfficiency( histDict["categDict"][ cat["name"] ].ProjectionX(histDict["name"]+"_projX"+str(i), i+1, i+1) ).CreateGraph()
+                        # For those who asked it, store each graph separately (for easier viewing in a TBrowser)
+                        if "effgraph" in histDict.keys():
+                            if histDict["effgraph"] is True:
+                                myEffGraph.Write( histDict["name"] + "_graph_" + str(i) )
+                        myList.Add(myEffGraph)
+                    
+                    myList.Write(histDict["name"] + "_graphs", ROOT.TObject.kSingleKey)
     
     outFile.Close()
 
@@ -377,6 +387,24 @@ def drawEffVsCutCurve(myTH1, total = 0):
     effV = [ x/integral for x in effV ]
     
     return ROOT.TGraph(len(discrV), np.array(discrV), np.array(effV))
+
+def createEfficiency(myTH1):
+    """ Create TEfficiency object based on the discriminant in myTH1:
+    Efficiency in bin i is #entries(bins >= i)/#total entries. 
+    Under- and overflow are taken into account. """
+
+    total = myTH1.Integral(0, myTH1.GetXaxis().GetNbins()+1)
+
+    totTH1 = ROOT.TH1D( myTH1.Clone("total") )
+    passTH1 = ROOT.TH1D( myTH1.Clone("passed") )
+    for i in range(totTH1.GetXaxis().GetNbins()+2):
+        totTH1.SetBinContent(i, total)
+        passTH1.SetBinContent(i, myTH1.Integral(i, totTH1.GetXaxis().GetNbins()+1))
+
+    myEff = ROOT.TEfficiency(passTH1, totTH1)
+    myEff.SetStatisticOption(ROOT.TEfficiency.kFCP)
+
+    return myEff
 
 
 def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants):

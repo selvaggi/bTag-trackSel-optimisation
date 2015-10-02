@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from tools.trackCounting import createDiscrHist, create2DDiscrHist
 
 #rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetTree_TC_btagCutsOnly.root"]
@@ -94,25 +95,28 @@ histList.append({
     "var": "Jet_Ip",
     "name": "Jet_Ip_DiscrEff",
     "title": "Jet first track IP sig.",
-    "bins": 100,
-    "range": [-5,20],
-    "discreff": True
+    "bins": 500,
+    "range": [-50,50],
+    "discreff": True,
+    "effgraph": False 
     })
 histList.append({
     "var": "TCHE",
     "name": "TCHE_DiscrEff",
     "title": "Jet TCHE",
-    "bins": 100,
-    "range": [-5,20],
-    "discreff": True
+    "bins": 500,
+    "range": [-50,50],
+    "discreff": True,
+    "effgraph": False
     })
 histList.append({
     "var": "TCHP",
     "name": "TCHP_DiscrEff",
     "title": "Jet TCHP",
-    "bins": 100,
-    "range": [-5,20],
-    "discreff": True
+    "bins": 500,
+    "range": [-50,50],
+    "discreff": True,
+    "effgraph": False
     })
 
 jetCutList = []
@@ -141,7 +145,7 @@ cutList = ["0"]
 #cutList = ["-005", "-0045", "-0033", "-0026"] # loosened bTag selection
 #cutList = ["-038", "-037", "-035"] # No selection, trackFromBvsOther 
 #cutList = ["-0444", "-0440", "-0434", "-0430"] # No selection, trackFromBvsOther 
-cutList = [ -0.2, -0.16, -0.1, -0.075 ]
+cutList = [0]*40 
 
 create2DDiscrHist(inFile, treeDirectory, outFile, histList, jetCutList, cutList)
 
