@@ -481,3 +481,62 @@ def drawROCfromEffVsCutCurves(sigGraph, bkgGraph):
 
     return ROOT.TGraphAsymmErrors(nPoints, np.array(sigEff), np.array(bkgEff), np.array(sigEffErrXLow), np.array(sigEffErrXUp), np.array(bkgEffErrYLow), np.array(bkgEffErrYUp))
 
+
+def createMVAPerfsFromROCCurves(inFile, outFile, sigCat, bkgCats, discriminants, workingPoints, mvaCuts):
+    """ Create a set of graphs of "cut on MVA" vs. "Tagger signal efficiency" for a given tagger background rejection (workingPoints) """
+    
+    inputFile = ROOT.TFile(inFile, "read")
+
+    outputFile = ROOT.TFile(outFile, "recreate")
+
+    for bkg in bkgCats:
+        outputFile.mkdir(sigCat + "_vs_" + bkg)
+        outputFile.cd(sigCat + "_vs_" + bkg)
+        
+        for discri in discriminants:
+            for wp, wpRej in workingPoints.items():
+                ROCList = inputFile.Get(sigCat + "_vs_" + bkg + "/" + discri)
+                perfCurve = drawPerfCurveFromROCList(ROCList, wpRej, mvaCuts)
+                perfCurve.Write(discri + "_" + wp)
+
+    outputFile.Close()
+    inputFile.Close()
+
+
+def drawPerfCurveFromROCList(ROCList, wpRej, cuts):
+    """ Draw a graph of "cut on MVA" vs. "Tagger signal efficiency" for a given tagger background rejection (wpRej) """
+
+    nROC = ROCList.GetEntries()
+    if nROC != len(cuts):
+        raise Exception("Error: number of cuts does not correspond to number of ROCs!")
+
+    effList = []
+    effListErrUp = []
+    effListErrLow = []
+
+    for i in range(nROC):
+        thisROC = ROCList.At(i)
+        nPoints = thisROC.GetN()
+       
+        foundPoint = False
+
+        for j in range(nPoints):
+            
+            sigEff = ROOT.Double()
+            bkgEff = ROOT.Double()
+            thisROC.GetPoint(j, sigEff, bkgEff)
+            
+            if bkgEff <= wpRej:
+                effList.append(sigEff)
+                effListErrLow.append(thisROC.GetErrorXlow(j))
+                effListErrUp.append(thisROC.GetErrorXhigh(j))
+                foundPoint = True
+                break
+
+        if not foundPoint:
+            effList.append(0)
+            effListErrLow.append(0)
+            effListErrUp.append(0)
+
+    return ROOT.TGraphAsymmErrors(nROC, np.array(cuts), np.array(effList), np.zeros(len(cuts)), np.zeros(len(cuts)), np.array(effListErrLow), np.array(effListErrUp))
+

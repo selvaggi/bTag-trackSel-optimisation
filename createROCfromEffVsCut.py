@@ -1,4 +1,5 @@
-from tools.trackCounting import createROCfromEffVsCutCurves
+import numpy as np
+from tools.trackCounting import createROCfromEffVsCutCurves, createMVAPerfsFromROCCurves
 
 #inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root"
@@ -55,3 +56,11 @@ createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants)
 #        thisInFile = inFile.replace("VALUE", cut)
 #        thisOutFile = outFile.replace("VALUE", cut)
 #        createROCfromEffVsCutCurves(thisInFile, thisOutFile, sigCat, bkgCats, discriminants)
+
+inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetROC_TC_testFormulaMVA.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/jetMVAPerfs_testFormulaMVA.root"
+
+workingPoints = { "loose": 0.1, "medium": 0.01 }
+mvaCuts = np.arange(-0.2, 0, 0.005)
+
+createMVAPerfsFromROCCurves(inFile, outFile, sigCat, bkgCats, discriminants, workingPoints, mvaCuts)

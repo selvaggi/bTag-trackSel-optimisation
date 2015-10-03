@@ -52,7 +52,7 @@ def printCanvas(canvas, name, format, directory):
         outFile = os.path.join(directory, name) + "." + format
         canvas.Print(outFile)
 
-def drawCanvas(runCfg, drawCfg, mode):
+def drawCanvas(runCfg, drawCfg, mode, otherObjects=None):
     """ Create, write and print a set of TCanvases containing sets of TH1s (mode='TH1') or TGraphs (mode='TGraph'). """
 
     if runCfg is None or drawCfg is None or mode is None:
@@ -86,9 +86,9 @@ def drawCanvas(runCfg, drawCfg, mode):
        
         myCnv = None
         if mode == "TH1":
-            myCnv = drawTH1Canvas(canvasCfg)
+            myCnv = drawTH1Canvas(canvasCfg, otherObjects)
         elif mode == "TGraph":
-            myCnv = drawTGraphCanvas(canvasCfg)
+            myCnv = drawTGraphCanvas(canvasCfg, otherObjects)
         else:
             raise Exception("Running mode was not specified correctly.")
 
@@ -120,7 +120,7 @@ def drawCanvas(runCfg, drawCfg, mode):
         outFile.Close()
 
 
-def drawTH1Canvas(cCfg):
+def drawTH1Canvas(cCfg, otherObjects=None):
     """ Create a TCanvas based on the Canvas configuration passed as argument.
     Adapted for drawing TH1's. """
 
@@ -149,7 +149,9 @@ def drawTH1Canvas(cCfg):
     except KeyError:
         pass
 
-    myLeg = defineLegend(cCfg["legPos"], len(cCfg["hists"]))
+    nOtherObjsLegs = 0
+    if otherObjects is not None: nOtherObjsLegs = len([obj for obj in otherObjects if "name" in obj.keys()])
+    myLeg = defineLegend(cCfg["legPos"], len(cCfg["hists"])+nOtherObjsLegs)
     # We need to keep track of ALL the objects created here, otherwise they will be deleted
     # when the function end and the TCanvas will end up containing only the TGraphs (and not the legend, ...)
     cCfg["_legend"] = myLeg
@@ -250,16 +252,25 @@ def drawTH1Canvas(cCfg):
     for hist in cCfg["hists"]:
         hist["_hist"].GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
 
+    # Other objects
+    if otherObjects in not None:
+        for obj in [ obj for obj in otherObjects if "name" in obj.keys() ]:
+            myLeg.AddEntry(obj["TObj"], obj["name"], obj["style"])
+
     # Time to draw!
     firstHist.Draw()
     for hist in cCfg["hists"]:
         hist["_hist"].Draw("same")
+    if otherObjects in not None:
+        for obj in otherObjects:
+            obj["TObj"].Draw("same")
+    myLeg.Draw("same")
     myLeg.Draw("same")
 
     return myCnv
 
 
-def drawTGraphCanvas(cCfg):
+def drawTGraphCanvas(cCfgi, otherObjects=None):
     """ Create a TCanvas based on the Canvas configuration passed as argument.
     Adapted for drawing TGraph's. """
 
@@ -288,7 +299,9 @@ def drawTGraphCanvas(cCfg):
     except KeyError:
         pass
 
-    myLeg = defineLegend(cCfg["legPos"], len(cCfg["graphs"]))
+    nOtherObjsLegs = 0
+    if otherObjects is not None: nOtherObjsLegs = len([obj for obj in otherObjects if "name" in obj.keys()])
+    myLeg = defineLegend(cCfg["legPos"], len(cCfg["graphs"])+nOtherObjsLegs)
     # We need to keep track of ALL the objects created here, otherwise they will be deleted
     # when the function end and the TCanvas will end up containing only the TGraphs (and not the legend, ...)
     cCfg["_legend"] = myLeg
@@ -305,6 +318,9 @@ def drawTGraphCanvas(cCfg):
     for i,gCfg in enumerate(cCfg["graphs"]):
         print "Drawing graph for {}.".format(gCfg["name"])
 
+        if "isFromTList" in gCfg.keys():
+            if gCfg["isFromTList"] is True:
+                gr = gr.At(gCfg["idx"])
         # Retrieve TGraph from file
         if not os.path.isfile(gCfg["file"]):
             raise Exception("File {} not found!".format(gCfg["file"]))
@@ -400,10 +416,18 @@ def drawTGraphCanvas(cCfg):
             cCfg["yRange"].reverse()
     myTH.GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
 
+    # Other objects
+    if otherObjects in not None:
+        for obj in [ obj for obj in otherObjects if "name" in obj.keys() ]:
+            myLeg.AddEntry(obj["TObj"], obj["name"], obj["style"])
+
     # Time to draw!
     myTH.Draw()
     for gr in cCfg["graphs"]:
         gr["_graph"].Draw(gr["style"])
+    if otherObjects in not None:
+        for obj in otherObjects:
+            obj["TObj"].Draw("same")
     myLeg.Draw("same")
 
     return myCnv
