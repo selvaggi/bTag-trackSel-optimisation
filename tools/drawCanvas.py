@@ -97,7 +97,7 @@ def drawCanvas(runCfg, drawCfg, mode):
             outFile.cd(canvasCfg["name"])
             myCnv.Write(canvasCfg["name"])
 
-        # Only print to a file is "printDir" is specified
+        # Only print to a file if "printDir" is specified
         try:
             printDir = runCfg["printDir"]
         except KeyError:
@@ -167,6 +167,9 @@ def drawTH1Canvas(cCfg):
             raise Exception("File {} not found!".format(hCfg["file"]))
         file = ROOT.TFile(hCfg["file"], "read")
         hist = file.Get(hCfg["key"])
+        if "isFromTList" in hCfg.keys():
+            if hCfg["isFromTList"] is True:
+                hist = gr.At(hCfg["idx"])
         # Hist is associated with file, and will be deleted when we close it, unless we do:
         hist.SetDirectory(0)
         if not isinstance(hist, ROOT.TH1):
@@ -306,7 +309,11 @@ def drawTGraphCanvas(cCfg):
         if not os.path.isfile(gCfg["file"]):
             raise Exception("File {} not found!".format(gCfg["file"]))
         file = ROOT.TFile(gCfg["file"], "read")
+
         gr = file.Get(gCfg["key"])
+        if "isFromTList" in gCfg.keys():
+            if gCfg["isFromTList"] is True:
+                gr = gr.At(gCfg["idx"])
         if not isinstance(gr, ROOT.TGraph):
             raise Exception("Could not retrieve properly TGraph {} from file {}.".format(cCfg["key"], gCfg["file"]))
 

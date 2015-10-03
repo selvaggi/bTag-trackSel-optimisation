@@ -407,27 +407,36 @@ def createEfficiency(myTH1):
     return myEff
 
 
-def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants):
+def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants, writeGraphs=False):
     """ Draw ROC curves from TGraphs (stored in inFile) of efficiency vs. discriminant cut value,
     created by the function createDiscrHist().
     Store the curves in outFile. """
 
     inputFile = ROOT.TFile(inFile, "read")
 
-    sigGraphs = { discri: inputFile.Get(sigCat + "/" + discri + "_graph") for discri in discriminants }
-    bkgGraphDict = {}
+    sigGraphList = { discri: inputFile.Get(sigCat + "/" + discri + "_graphs") for discri in discriminants }
+    bkgGraphListDict = {}
     for bkg in bkgCats:
-        bkgGraphDict[bkg] = { discri: inputFile.Get(bkg + "/" + discri + "_graph") for discri in discriminants }
+        bkgGraphListDict[bkg] = { discri: inputFile.Get(bkg + "/" + discri + "_graphs") for discri in discriminants }
 
     outputFile = ROOT.TFile(outFile, "recreate")
 
-    for bkg, graphs in bkgGraphDict.items():
+    for bkg, bkgGraphList in bkgGraphListDict.items():
         outputFile.mkdir(sigCat + "_vs_" + bkg)
         outputFile.cd(sigCat + "_vs_" + bkg)
 
         for discri in discriminants:
-            myROC = drawROCfromEffVsCutCurves(sigGraphs[discri], graphs[discri])
-            myROC.Write(discri)
+            myList = ROOT.TList()
+            
+            for i in range(bkgGraphList[discri].GetEntries()):
+                bkgGraph = bkgGraphList[discri].At(i)
+                sigGraph = sigGraphList[discri].At(i)
+                myROC = drawROCfromEffVsCutCurves(sigGraph, bkgGraph)
+                myList.Add(myROC)
+                if writeGraphs:
+                    myROC.Write(discri + "_{}".format(i))
+            
+            myList.Write(discri, ROOT.TObject.kSingleKey)
 
     inputFile.Close()
     outputFile.Close()
@@ -447,7 +456,11 @@ def drawROCfromEffVsCutCurves(sigGraph, bkgGraph):
         sys.exit(1)
 
     sigEff = []
+    sigEffErrXLow = []
+    sigEffErrXUp = []
     bkgEff = []
+    bkgEffErrYLow = []
+    bkgEffErrYUp = []
 
     for i in range(nPoints):
         sigValX = ROOT.Double()
@@ -459,7 +472,12 @@ def drawROCfromEffVsCutCurves(sigGraph, bkgGraph):
         bkgGraph.GetPoint(i, bkgValX, bkgValY)
 
         sigEff.append(sigValY)
-        bkgEff.append(bkgValY)
+        sigEffErrXLow.append(sigGraph.GetErrorXlow(i))
+        sigEffErrXUp.append(sigGraph.GetErrorXhigh(i))
 
-    return ROOT.TGraph(nPoints, np.array(sigEff), np.array(bkgEff))
+        bkgEff.append(bkgValY)
+        bkgEffErrYLow.append(bkgGraph.GetErrorYlow(i))
+        bkgEffErrYUp.append(bkgGraph.GetErrorYhigh(i))
+
+    return ROOT.TGraphAsymmErrors(nPoints, np.array(sigEff), np.array(bkgEff), np.array(sigEffErrXLow), np.array(sigEffErrXUp), np.array(bkgEffErrYLow), np.array(bkgEffErrYUp))
 

@@ -5,7 +5,7 @@ from tools.drawCanvas import drawCanvas
 
 # "Aliases"
 
-drawStyle = "L"
+drawStyle = "LX"
 markerStyle = 24
 markerSize = 1.35
 lineStyle = 1
@@ -144,38 +144,38 @@ flavours = [
 #    ]
 
 ## loosened bTag Selection
-cuts = [
-        {
-            "name": "Default cuts", # for legend
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-            "color": ROOT.kBlue,
-        },
-        {
-            "name": "Loosened cuts", # for legend
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetROC_TC_loosenedbtagCutsOnly.root",
-            "color": ROOT.kRed,
-        },
-        {
-            "name": "Loosened cuts + MVA>-0.05",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-005.root",
-            "color": ROOT.kMagenta+1,
-        },
-        {
-            "name": "Loosened cuts + MVA>-0.045",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0045.root",
-            "color": ROOT.kGreen+1,
-        },
-        {
-            "name": "Loosened cuts + MVA>-0.033",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0033.root",
-            "color": ROOT.kOrange,
-        },
-        #{
-        #    "name": "Loosened cuts + MVA>-0.026",
-        #    "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0026.root",
-        #    "color": ROOT.kRed,
-        #}
-    ]
+#cuts = [
+#        {
+#            "name": "Default cuts", # for legend
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
+#            "color": ROOT.kBlue,
+#        },
+#        {
+#            "name": "Loosened cuts", # for legend
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetROC_TC_loosenedbtagCutsOnly.root",
+#            "color": ROOT.kRed,
+#        },
+#        {
+#            "name": "Loosened cuts + MVA>-0.05",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-005.root",
+#            "color": ROOT.kMagenta+1,
+#        },
+#        {
+#            "name": "Loosened cuts + MVA>-0.045",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0045.root",
+#            "color": ROOT.kGreen+1,
+#        },
+#        {
+#            "name": "Loosened cuts + MVA>-0.033",
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0033.root",
+#            "color": ROOT.kOrange,
+#        },
+#        #{
+#        #    "name": "Loosened cuts + MVA>-0.026",
+#        #    "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0026.root",
+#        #    "color": ROOT.kRed,
+#        #}
+#    ]
 
 ## loosened bTag Selection
 #cuts = [
@@ -211,6 +211,18 @@ cuts = [
 #        },
 #    ]
 
+cuts = [
+        {
+            "name": "MVA>#cutvalue",
+            "wps": [ 
+                { "idx": 0, "val": -0.2, "col": ROOT.kRed },
+                { "idx": 15, "val": -0.1, "col": ROOT.kGreen },
+                { "idx": 25, "val": -0.05, "col": ROOT.kBlue }
+            ],
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetROC_TC_testFormulaMVA.root",
+        }
+    ]
+
 discriminants = [
         {
             "key": "TCHE_DiscrEff",
@@ -226,8 +238,8 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDTloosenedbTagCuts/btagCutsOnly_BDTbTagCuts_-005_-0045_-0033_-0026.root",
-        "printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDTloosenedbTagCuts/plots", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/testROCCanvases.root",
+        "printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/plots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
@@ -241,18 +253,22 @@ for discr in discriminants:
 
         myGraphs = []
         for cut in cuts:
-            graphCfg = {   
-                    "file": cut["file"],
-                    "key": flav["key"] + "/" + discr["key"],
-                    "name": cut["name"],
-                    "color": cut["color"],
-                    "style": drawStyle,
-                    "markerStyle": markerStyle, # Only used if "P" in "style" (default 20)
-                    "markerSize": markerSize, # (default 1)
-                    "lineStyle": lineStyle, # Only used if "L" in "style" (default 1)
-                    "lineWidth": lineWidth, # (default 1)
-                }
-            myGraphs.append(graphCfg)
+            for wp in cut["wps"]:
+                graphCfg = {   
+                        "file": cut["file"],
+                        "key": flav["key"] + "/" + discr["key"],
+                        # Following two options only when the Graph is retrieved from a list of graphs in the file
+                        "isFromTList": True,
+                        "idx": wp["idx"],
+                        "name": cut["name"].replace("#cutvalue", str(wp["val"])),
+                        "color": wp["col"],
+                        "style": drawStyle,
+                        "markerStyle": markerStyle, # Only used if "P" in "style" (default 20)
+                        "markerSize": markerSize, # (default 1)
+                        "lineStyle": lineStyle, # Only used if "L" in "style" (default 1)
+                        "lineWidth": lineWidth, # (default 1)
+                    }
+                myGraphs.append(graphCfg)
 
         myCanvas = {
                 "name": discr["filename"] + "_" + flav["filename"], # Name of the canvas for the output ROOT/png/... files
