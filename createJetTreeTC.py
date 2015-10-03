@@ -4,7 +4,7 @@ from tools.trackCounting import createJetTreeTC
 
 #storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/trackOpti/QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50nsRecodebug_MCRUN2_74_V9A-v1_2015-06-19/150619_133609/0000"
-rootFileNames = [ "JetTree_mc_{}.root".format(i) for i in range(1, 30) ]
+rootFileNames = [ "JetTree_mc_{}.root".format(i) for i in range(1, 236) ]
 treeDirectory = "btagana/ttree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"
@@ -19,7 +19,7 @@ treeDirectory = "btagana/ttree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetTree_testFormulaMVA.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetTree_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
 
 # bTag current selection
 trackCut = "Track_nHitPixel >= 2 && Track_nHitAll >= 8 && abs(Track_IP2D) < 0.2 && Track_pt > 1 && \
@@ -28,7 +28,7 @@ trackCut = "Track_nHitPixel >= 2 && Track_nHitAll >= 8 && abs(Track_IP2D) < 0.2 
 # Variables used by TMVA
 # Caution! Needs to be same order as when the MVA was trained! (thank you TMVA)
 trackMVAVars = [
-    "log(abs(Track_dz))",
+    "Track_dz",
     "Track_length",
     "Track_dist",
     "Track_IP2D",
@@ -45,8 +45,9 @@ trackMVA = {
         #"name": "N_Nmin1_bTag_zIP_absSel_ptChi2BothHits",
         
         ## No selection
-        #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_noSel_allVar.weights.xml",
-        #"name": "800_track_hist_BfrombVSFake_noSel_allVar",
+        "path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_noSel_allVar.weights.xml",
+        "name": "800_track_hist_BfrombVSFake_noSel_allVar",
+        "cuts": np.arange(-0.3, -0.045, 0.005),
         
         ## bTag selection
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_bTagSel_allVar.weights.xml",
@@ -57,8 +58,8 @@ trackMVA = {
         #"name": "BDT_800_track_hist_BfrombVSFake_bTagLoosenedSel_allVar",
         
         ## No selection, Log(dz)
-        "path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_noSel_allVarLogdz.weights.xml",
-        "name": "800_track_hist_BfrombVSFake_noSel_allVarLogdz",
+        #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_noSel_allVarLogdz.weights.xml",
+        #"name": "800_track_hist_BfrombVSFake_noSel_allVarLogdz",
 
         ## bTag selection, Log(dz)
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_BfrombVSFake_bTagSel_allVarLogdz.weights.xml",
@@ -72,8 +73,6 @@ trackMVA = {
         #"path": "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/weights/BDT_800_track_hist_trackFrombJetVStrackNonbJet_noSel_allVar.weights.xml",
         #"name": "BDT_800_track_hist_trackFrombJetVStrackNonbJet_noSel_allVar",
         
-        #"cuts": [ -0.2, -0.19, -0.16, -0.14, -0.12, -0.1, -0.08, -0.06 ],
-        "cuts": np.arange(-0.2, 0, 0.005),
         "vars": trackMVAVars
         }
 

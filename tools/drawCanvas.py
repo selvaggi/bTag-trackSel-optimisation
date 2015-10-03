@@ -253,7 +253,7 @@ def drawTH1Canvas(cCfg, otherObjects=None):
         hist["_hist"].GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
 
     # Other objects
-    if otherObjects in not None:
+    if otherObjects is not None:
         for obj in [ obj for obj in otherObjects if "name" in obj.keys() ]:
             myLeg.AddEntry(obj["TObj"], obj["name"], obj["style"])
 
@@ -261,7 +261,7 @@ def drawTH1Canvas(cCfg, otherObjects=None):
     firstHist.Draw()
     for hist in cCfg["hists"]:
         hist["_hist"].Draw("same")
-    if otherObjects in not None:
+    if otherObjects is not None:
         for obj in otherObjects:
             obj["TObj"].Draw("same")
     myLeg.Draw("same")
@@ -270,7 +270,7 @@ def drawTH1Canvas(cCfg, otherObjects=None):
     return myCnv
 
 
-def drawTGraphCanvas(cCfgi, otherObjects=None):
+def drawTGraphCanvas(cCfg, otherObjects=None):
     """ Create a TCanvas based on the Canvas configuration passed as argument.
     Adapted for drawing TGraph's. """
 
@@ -417,7 +417,7 @@ def drawTGraphCanvas(cCfgi, otherObjects=None):
     myTH.GetYaxis().SetRangeUser(cCfg["yRange"][0], cCfg["yRange"][1])
 
     # Other objects
-    if otherObjects in not None:
+    if otherObjects is not None:
         for obj in [ obj for obj in otherObjects if "name" in obj.keys() ]:
             myLeg.AddEntry(obj["TObj"], obj["name"], obj["style"])
 
@@ -425,7 +425,7 @@ def drawTGraphCanvas(cCfgi, otherObjects=None):
     myTH.Draw()
     for gr in cCfg["graphs"]:
         gr["_graph"].Draw(gr["style"])
-    if otherObjects in not None:
+    if otherObjects is not None:
         for obj in otherObjects:
             obj["TObj"].Draw("same")
     myLeg.Draw("same")
