@@ -2,9 +2,9 @@ import os
 import numpy as np
 from tools.trackCounting import createDiscrHist, create2DDiscrHist
 
-#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetTree_TC_btagCutsOnly.root"]
-#treeDirectory = "jetTree"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetHistos_TC_btagCutsOnly.root"
+rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetTrees_btagCutsOnly/*.root"]
+treeDirectory = "jetTree"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetHistos_TC_btagCutsOnly.root"
 
 #rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetTree_TC_loosenedbtagCutsOnly.root"]
 #treeDirectory = "jetTree"
@@ -19,9 +19,10 @@ from tools.trackCounting import createDiscrHist, create2DDiscrHist
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetHistos_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"
 
 ## No selection
-#rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
+#inputFiles = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetTrees_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/*.root"]
 #treeDirectory = "jetTree"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
+#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetHistos_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
+#cutList = np.arange(-0.3, -0.045, 0.005)
 
 ## bTag selection
 #rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
@@ -42,10 +43,6 @@ from tools.trackCounting import createDiscrHist, create2DDiscrHist
 #rootFileNames = ["/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"]
 #treeDirectory = "jetTree"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
-
-inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetTree_testFormulaMVA.root"
-treeDirectory = "jetTree"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetHisto_testFormulaMVA.root"
 
 histList = []
 histList.append({
@@ -73,50 +70,50 @@ histList.append({
     "var": "Jet_Ip",
     "name": "Jet_Ip",
     "title": "Jet first track IP sig.",
-    "bins": 100,
+    "bins": 500,
     "range": [-100,100],
     })
 histList.append({
     "var": "TCHE",
     "name": "TCHE",
     "title": "Jet TCHE",
-    "bins": 100,
+    "bins": 500,
     "range": [-100,100],
     })
 histList.append({
     "var": "TCHP",
     "name": "TCHP",
     "title": "Jet TCHP",
-    "bins": 100,
+    "bins": 500,
     "range": [-100,100],
     })
 # These will also included, and will be used to draw an "efficiency vs. cut value" curve
-histList.append({
-    "var": "Jet_Ip",
-    "name": "Jet_Ip_DiscrEff",
-    "title": "Jet first track IP sig.",
-    "bins": 500,
-    "range": [-50,50],
-    "discreff": True,
-    "effgraph": False 
-    })
+#histList.append({
+#    "var": "Jet_Ip",
+#    "name": "Jet_Ip_DiscrEff",
+#    "title": "Jet first track IP sig.",
+#    "bins": 1000,
+#    "range": [-1000,1000],
+#    "discreff": True, # Do the efficiency curve
+#    "effgraph": True, # Save a graph for each cut value separately (more disk usage, but easier browsing)
+#    })
 histList.append({
     "var": "TCHE",
     "name": "TCHE_DiscrEff",
     "title": "Jet TCHE",
-    "bins": 500,
-    "range": [-50,50],
+    "bins": 1000,
+    "range": [-1000,1000],
     "discreff": True,
-    "effgraph": False
+    "effgraph": True,
     })
 histList.append({
     "var": "TCHP",
     "name": "TCHP_DiscrEff",
     "title": "Jet TCHP",
-    "bins": 500,
-    "range": [-50,50],
+    "bins": 1000,
+    "range": [-1000,1000],
     "discreff": True,
-    "effgraph": False
+    "effgraph": True,
     })
 
 jetCutList = []
@@ -137,7 +134,6 @@ jetCutList.append({
     "cuts": "Jet_genpt < 8"
     })
 
-cutList = ["0"]
 #cutList = ["067", "073", "080"]
 #cutList = ["055", "070", "080"]
 #cutList = ["-0065", "-0080", "-0100", "-0150"] # No selection
@@ -145,9 +141,8 @@ cutList = ["0"]
 #cutList = ["-005", "-0045", "-0033", "-0026"] # loosened bTag selection
 #cutList = ["-038", "-037", "-035"] # No selection, trackFromBvsOther 
 #cutList = ["-0444", "-0440", "-0434", "-0430"] # No selection, trackFromBvsOther 
-cutList = [0]*40 
 
-create2DDiscrHist(inFile, treeDirectory, outFile, histList, jetCutList, cutList)
+create2DDiscrHist(inputFiles, treeDirectory, outFile, histList, jetCutList, cutList)
 
 #if __name__ == "__main__":
 #    for cut in cutList:

@@ -14,8 +14,8 @@ from tools.trackCounting import createROCfromEffVsCutCurves, createMVAPerfsFromR
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"
 
 ## No Selection
-#inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUTVALUE.root"
+inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetHistos_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
+outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetROC_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
 
 ## bTag selection
 #inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
@@ -33,12 +33,10 @@ from tools.trackCounting import createROCfromEffVsCutCurves, createMVAPerfsFromR
 #inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetHistos_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUTVALUE.root"
 
-inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetHisto_testFormulaMVA.root"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetROC_TC_testFormulaMVA.root"
-
 sigCat = "Bjets"
 bkgCats = ["Cjets", "Lightjets", "PUjets"]
-discriminants = ["Jet_Ip_DiscrEff", "TCHE_DiscrEff", "TCHP_DiscrEff"]
+discriminants = ["TCHE_DiscrEff", "TCHP_DiscrEff"]
+#discriminants = ["Jet_Ip_DiscrEff", "TCHE_DiscrEff", "TCHP_DiscrEff"]
 
 #cutList = ["0"]
 #cutList = ["067", "073", "080"]
@@ -57,10 +55,11 @@ createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants)
 #        thisOutFile = outFile.replace("VALUE", cut)
 #        createROCfromEffVsCutCurves(thisInFile, thisOutFile, sigCat, bkgCats, discriminants)
 
-inFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/jetROC_TC_testFormulaMVA.root"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/jetMVAPerfs_testFormulaMVA.root"
+# No Selection
+inFile = outFile 
+outFile ="/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetMVAperf_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
+mvaCuts = np.arange(-0.3, -0.045, 0.005)
 
 workingPoints = { "loose": 0.1, "medium": 0.01 }
-mvaCuts = np.arange(-0.2, 0, 0.005)
 
 createMVAPerfsFromROCCurves(inFile, outFile, sigCat, bkgCats, discriminants, workingPoints, mvaCuts)

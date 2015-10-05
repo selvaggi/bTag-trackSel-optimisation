@@ -67,14 +67,14 @@ class trackMVASelector:
 
 
 
-def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackMVA=None):
+def createJetTreeTC(inputFileList, treeDirectory, outFileName, trackCut=None, trackMVA=None):
     """ Create TTree containing info about the jets.
     The tracks in the jets are selected either using cuts, or a MVA, or both.
     Only jets with at least one track are kept.
     For each jet, the number of selected tracks, and the jet IPsig, TCHE, and TCHP values are stored as vectors (one entry per cut on the MVA)."""
 
     tree = ROOT.TChain(treeDirectory)
-    for file in rootFiles:
+    for file in inputFileList:
         tree.Add(file)
 
     outFile = ROOT.TFile(outFileName, "recreate")
@@ -94,7 +94,6 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
     copiedVariables = dict( copiedVariablesFloat, **copiedVariablesInt )
     
     # The variables that we compute here and store in the output tree
-    nCuts = 1
     outVariablesIntToStore = ["Jet_nseltracks"]
     outVariablesFloatToStore = ["Jet_Ip", "TCHE", "TCHP"]
     outVariables = dict( { name: ROOT.std.vector(float)() for name in outVariablesFloatToStore }, **{ name: ROOT.std.vector(int)() for name in outVariablesIntToStore } )
@@ -106,6 +105,7 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
 
     formulaManager = ROOT.Formulas()
     
+    nCuts = 1
     # Create a trackCutSelector to select tracks using cuts
     myTrackCutSel = None
     if trackCut is not None:
@@ -191,7 +191,7 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
                     outVariables["Jet_nseltracks"].push_back(len(selTracks[i]))
 
                     # Sort tracks according to decreasing IP significance
-                    sorted(selTracks[i], reverse = True, key = lambda track: track[1])
+                    selTracks[i].sort(reverse = True, key = lambda track: track[1])
 
                     # TCHE = IPsig of 2nd track, TCHP = IPsig of 3rd track (default to -10**10)
                     outVariables["Jet_Ip"].push_back(selTracks[i][0][1])
@@ -219,10 +219,10 @@ def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackM
             print "MVA cut value {}:".format(trackMVA["cuts"][i])
         else:
             print "Non-MVA cuts:"
-        print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB[i], nTotTracksB, float(100*nSelTracksB[i])/nTotTracksB)
-        print "C track efficiency:  {}/{} = {}%.".format(nSelTracksC[i], nTotTracksC, float(100*nSelTracksC[i])/nTotTracksC)
-        print "Light track efficiency:  {}/{} = {}%.".format(nSelTracksLight[i], nTotTracksB, float(100*nSelTracksLight[i])/nTotTracksLight)
-        print "PU track efficiency: {}/{} = {}%.\n".format(nSelTracksPU[i], nTotTracksPU, float(100*nSelTracksPU[i])/nTotTracksPU)
+        if nTotTracksB != 0: print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB[i], nTotTracksB, float(100*nSelTracksB[i])/nTotTracksB)
+        if nTotTracksC != 0: print "C track efficiency:  {}/{} = {}%.".format(nSelTracksC[i], nTotTracksC, float(100*nSelTracksC[i])/nTotTracksC)
+        if nTotTracksLight != 0: print "Light track efficiency:  {}/{} = {}%.".format(nSelTracksLight[i], nTotTracksB, float(100*nSelTracksLight[i])/nTotTracksLight)
+        if nTotTracksPU != 0: print "PU track efficiency: {}/{} = {}%.\n".format(nSelTracksPU[i], nTotTracksPU, float(100*nSelTracksPU[i])/nTotTracksPU)
 
     outFile.cd()
     outTree.Write()
@@ -241,11 +241,13 @@ def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetC
     outFile = ROOT.TFile(outputFileName, "recreate")
 
     # Define the jet category selection formulae
+    myFormulaManager = ROOT.Formulas()
     for cat in jetCategList:
         cat["formula"] = ROOT.TTreeFormula(cat["name"], cat["cuts"], tree)
-        tree.SetNotify(cat["formula"])
+        myFormulaManager.Add(cat["formula"])
         outFile.mkdir(cat["name"])
         cat["total"] = 0 # keep track of the total number of entries for each jet category
+    tree.SetNotify(myFormulaManager)
 
     # For each histogram of histList, and for each cut of jetCutList, define a TH1
     for histDict in histList:
@@ -285,26 +287,26 @@ def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetC
     outFile.Close()
 
 
-def create2DDiscrHist(inputFile, treeDirectory, outputFileName, histList, jetCategList, mvaCutList):
+def create2DDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetCategList, mvaCutList = [0]):
     """ Using the tree output by createJetTreeTC, create histograms of the variables defined in histList.
     A separate histogram is created on the set of jets defined by each cut in jetCategList.
     The y-direction of the histogram corresponds to different cut values on the MVA.
     The histograms are then saved in outputFileName, in different folders. """
 
     tree = ROOT.TChain(treeDirectory)
-    if not os.path.isfile(inputFile):
-        raise Exception("File {} is not valid.".format(inputFile))
-    tree.Add(inputFile)
+    for file in inputFileList:
+        tree.Add(file)
 
     outFile = ROOT.TFile(outputFileName, "recreate")
 
     # Define the jet category selection formulae
+    myFormulaManager = ROOT.Formulas()
     for cat in jetCategList:
         cat["formula"] = ROOT.TTreeFormula(cat["name"], cat["cuts"], tree)
-        tree.SetNotify(cat["formula"])
+        myFormulaManager.Add(cat["formula"])
         outFile.mkdir(cat["name"])
         cat["total"] = 0 # keep track of the total number of entries for each jet category
-
+    tree.SetNotify(myFormulaManager)
     nCuts = len(mvaCutList)
 
     # For each histogram of histList, and for each cut of jetCutList, define a TH2

@@ -13,8 +13,8 @@ lineWidth = 2
 
 grid = "xy"
 log = ""
-xRange = [-0.2,0.01]
-yRange = [0, 0.5]
+xRange = [-0.3,0.]
+yRange = [0, 0.7]
 xSize = 800
 ySize = 600
 
@@ -38,9 +38,9 @@ flavours = [
 
 MVAs = [
         {
-            "name": "this nice MVA",
-            "color": ROOT.kBlue,
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/jetMVAPerfs_testFormulaMVA.root",
+            "name": "No preselection",
+            "color": ROOT.kOrange,
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetMVAperf_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
         }
     ]
 
@@ -61,7 +61,7 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/testMVACanvases.root",
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetMVAperfCanvases_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root",
         #"printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/MVAplots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional

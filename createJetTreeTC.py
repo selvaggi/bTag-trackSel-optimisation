@@ -1,29 +1,28 @@
 import os
+import sys
 import numpy as np
 from tools.trackCounting import createJetTreeTC
 
 #storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
 storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/trackOpti/QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt50nsRecodebug_MCRUN2_74_V9A-v1_2015-06-19/150619_133609/0000"
-rootFileNames = [ "JetTree_mc_{}.root".format(i) for i in range(1, 236) ]
+firstFile = int(sys.argv[1])
+lastFile = int(sys.argv[2])
+rootFileNames = [ "JetTree_mc_{}.root".format(i) for i in range(firstFile, lastFile) ]
 treeDirectory = "btagana/ttree"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIPSel_ptChi2BothHits_CUTVALUE.root"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUTVALUE.root"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetTree_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUTVALUE.root"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetTree_TC_btagCutsOnly.root"
 
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetTree_TC_btagCutsOnly.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetTree_TC_loosenedbtagCutsOnly.root"
-#outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_Log_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
 #outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTree_TC_BDT_CUTVALUE.root"
-outFile = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetTree_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
+
+#outDir = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/btagCutsOnly/jetTrees/"
+outDir = "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetTrees/"
 
 # bTag current selection
 trackCut = "Track_nHitPixel >= 2 && Track_nHitAll >= 8 && abs(Track_IP2D) < 0.2 && Track_pt > 1 && \
-            Track_chi2 < 5 && abs(Track_dz) < 17 && Track_length < 5 && Track_dist < 0.07" # bTag current selection
+            Track_chi2 < 5 && abs(Track_dz) < 17 && Track_length < 5 && abs(Track_dist) < 0.07" # bTag current selection
 
 # Variables used by TMVA
 # Caution! Needs to be same order as when the MVA was trained! (thank you TMVA)
@@ -139,6 +138,12 @@ trackMVA = {
 #}
 
 if __name__ == "__main__":
-    fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
+    inFileList = []
+    for file in rootFileNames:
+        inFileList.append(os.path.join(storeDirectory, file))
+    #outFile = os.path.join(outDir, rootFileNames[0])
+    outFile = rootFileNames[0]
+    if len(sys.argv) >= 4:
+        outFile = sys.argv[3]
 
-    createJetTreeTC(fileList, treeDirectory, outFile, trackCut=None, trackMVA=trackMVA)
+    createJetTreeTC(inFileList, treeDirectory, outFile, trackCut=None, trackMVA=trackMVA)
