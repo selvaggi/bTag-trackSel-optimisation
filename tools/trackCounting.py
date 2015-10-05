@@ -323,7 +323,7 @@ def create2DDiscrHist(inputFileList, treeDirectory, outputFileName, histList, je
                 for histDict in histList:
                     value = tree.__getattr__(histDict["var"])
                     try:
-                        if len(value) > 1:
+                        if len(value) >= 1:
                             for mvaCut in xrange( len(value) ):
                                 # We don't want to include the under/overflow:
                                 #if value[mvaCut] >= histDict["range"][0] and value[mvaCut] < histDict["range"][1]:
@@ -527,13 +527,34 @@ def drawPerfCurveFromROCList(ROCList, wpRej, cuts):
             sigEff = ROOT.Double()
             bkgEff = ROOT.Double()
             thisROC.GetPoint(j, sigEff, bkgEff)
+
+            if j == 0 and bkgEff <= wpRej:
+                # If the first point on the ROC curve is already below the working point, we cannot do anything
+                break
+            
+            sigEffPrev = ROOT.Double(0)
+            bkgEffPrev = ROOT.Double(0)
+            if j >= 1:
+                thisROC.GetPoint(j-1, sigEffPrev, bkgEffPrev)
             
             if bkgEff <= wpRej:
-                effList.append(sigEff)
-                effListErrLow.append(thisROC.GetErrorXlow(j))
-                effListErrUp.append(thisROC.GetErrorXhigh(j))
-                foundPoint = True
-                break
+                # We have crossed the working point => do a linear interpolation between this point and the previous one to find the correct signal efficiency value
+                
+                if bkgEff == wpRej:
+                    effList.append(sigEff)
+                    effListErrLow.append(thisROC.GetErrorXlow(j))
+                    effListErrUp.append(thisROC.GetErrorXhigh(j))
+                    foundPoint = True
+                    break
+                
+                elif sigEffPrev != 0 and sigEffPrev != sigEff and bkgEffPrev != bkgEff:
+                    slope = (bkgEffPrev-bkgEff)/(sigEffPrev-sigEff)
+                    correctSigEff = (wpRej-bkgEff)/slope + sigEff
+                    effList.append(correctSigEff)
+                    effListErrLow.append( ( (correctSigEff-sigEff)*thisROC.GetErrorXlow(j-1) + (sigEffPrev-correctSigEff)*thisROC.GetErrorXlow(j) ) / (sigEffPrev-sigEff) )
+                    effListErrUp.append( ( (correctSigEff-sigEff)*thisROC.GetErrorXhigh(j-1) + (sigEffPrev-correctSigEff)*thisROC.GetErrorXhigh(j) ) / (sigEffPrev-sigEff) )
+                    foundPoint = True
+                    break
 
         if not foundPoint:
             effList.append(0)

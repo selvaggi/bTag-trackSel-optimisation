@@ -13,7 +13,7 @@ lineWidth = 2
 
 grid = "xy"
 log = ""
-xRange = [-0.3,0.]
+xRange = [-0.3,0.1]
 yRange = [0, 0.7]
 xSize = 800
 ySize = 600
@@ -40,7 +40,17 @@ MVAs = [
         {
             "name": "No preselection",
             "color": ROOT.kOrange,
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetMVAperf_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root"
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_LogdZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetMVAperf_TC.root"
+        },
+        {
+            "name": "Loose preselection",
+            "color": ROOT.kRed,
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetMVAperf_TC.root"
+        },
+        {
+            "name": "Default preselection",
+            "color": ROOT.kMagenta+1,
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_bTagCuts_LogdZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetMVAperf_TC.root"
         }
     ]
 
@@ -61,7 +71,7 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetMVAperfCanvases_TC_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll.root",
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/jetMVAperfCanvases_TC.root",
         #"printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/testFormulaMVA/MVAplots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional

@@ -318,9 +318,6 @@ def drawTGraphCanvas(cCfg, otherObjects=None):
     for i,gCfg in enumerate(cCfg["graphs"]):
         print "Drawing graph for {}.".format(gCfg["name"])
 
-        if "isFromTList" in gCfg.keys():
-            if gCfg["isFromTList"] is True:
-                gr = gr.At(gCfg["idx"])
         # Retrieve TGraph from file
         if not os.path.isfile(gCfg["file"]):
             raise Exception("File {} not found!".format(gCfg["file"]))
