@@ -5,7 +5,7 @@ from tools.drawCanvas import drawCanvas
 
 # "Aliases"
 
-drawStyle = "L"
+drawStyle = "LX"
 markerStyle = 24
 markerSize = 1.35
 lineStyle = 1
@@ -38,178 +38,63 @@ flavours = [
 
 #cuts = [
 #        {
-#            "name": "Default cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-#            "color": ROOT.kBlue,
+#            "name": "MVA>#cutvalue",
+#            "wps": [ 
+#                { "idx": 8, "val": -0.08, "col": ROOT.kMagenta+1 },
+#                { "idx": 12, "val": -0.07, "col": ROOT.kGreen+1 },
+#                { "idx": 20, "val": -0.05, "col": ROOT.kOrange },
+#                { "idx": 28, "val": -0.03, "col": ROOT.kRed },
+#            ],
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_LogdZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC.root",
 #        },
 #        {
-#            "name": "Default + MVA>0.67",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUT067.root",
-#            "color": ROOT.kMagenta+1,
-#        },
-#        {
-#            "name": "Default + MVA>0.73",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUT073.root",
-#            "color": ROOT.kGreen+1,
-#        },
-#        {
-#            "name": "Default + MVA>0.8",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_ptChi2BothHits_CUT080.root",
-#            "color": ROOT.kOrange,
-#        },
-#
-#    ]
-
-#cuts = [
-#        {
-#            "name": "Default cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-#            "color": ROOT.kBlue,
-#        },
-#        {
-#            "name": "Default + MVA>0.55",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUT055.root",
-#            "color": ROOT.kMagenta+1,
-#        },
-#        {
-#            "name": "Default + MVA>0.7",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUT070.root",
-#            "color": ROOT.kGreen+1,
-#        },
-#        {
-#            "name": "Default + MVA>0.8",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits/jetROC_TC_btagCuts_MLP_N_Nmin1_bTag_zIP_absSel_lengthDistptChi2BothHits_CUT080.root",
-#            "color": ROOT.kOrange,
-#        },
-#
-#    ]
-
-## No Selection
-#cuts = [
-#        {
-#            "name": "Default cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-#            "color": ROOT.kBlue,
-#        },
-#        {
-#            "name": "MVA>-0.065",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0065.root",
-#            "color": ROOT.kMagenta+1,
-#        },
-#        {
-#            "name": "MVA>-0.080",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0080.root",
-#            "color": ROOT.kGreen+1,
-#        },
-#        {
-#            "name": "MVA>-0.100",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0100.root",
-#            "color": ROOT.kOrange,
-#        },
-#        {
-#            "name": "MVA>-0.150",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0150.root",
-#            "color": ROOT.kRed,
+#            "name": "Default cuts",
+#            "wps": [ 
+#                { "idx": 0, "col": ROOT.kBlue }
+#            ],
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/btagCutsOnly/jetROC_TC.root",
 #        }
 #    ]
 
-
-## bTag Selection
-#cuts = [
-#        {
-#            "name": "Default cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-#            "color": ROOT.kBlue,
-#        },
-#        {
-#            "name": "Default cuts + MVA>-0.20",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-020.root",
-#            "color": ROOT.kMagenta+1,
-#        },
-#        {
-#            "name": "Default cuts + MVA>-0.16",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-016.root",
-#            "color": ROOT.kGreen+1,
-#        },
-#        {
-#            "name": "Default cuts + MVA>-0.10",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-010.root",
-#            "color": ROOT.kOrange,
-#        },
-#        {
-#            "name": "Default cuts + MVA>-0.075",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_bTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0075.root",
-#            "color": ROOT.kRed,
-#        }
-#    ]
-
-## loosened bTag Selection
-#cuts = [
-#        {
-#            "name": "Default cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-#            "color": ROOT.kBlue,
-#        },
-#        {
-#            "name": "Loosened cuts", # for legend
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetROC_TC_loosenedbtagCutsOnly.root",
-#            "color": ROOT.kRed,
-#        },
-#        {
-#            "name": "Loosened cuts + MVA>-0.05",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-005.root",
-#            "color": ROOT.kMagenta+1,
-#        },
-#        {
-#            "name": "Loosened cuts + MVA>-0.045",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0045.root",
-#            "color": ROOT.kGreen+1,
-#        },
-#        {
-#            "name": "Loosened cuts + MVA>-0.033",
-#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0033.root",
-#            "color": ROOT.kOrange,
-#        },
-#        #{
-#        #    "name": "Loosened cuts + MVA>-0.026",
-#        #    "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0026.root",
-#        #    "color": ROOT.kRed,
-#        #}
-#    ]
-
-## loosened bTag Selection
 cuts = [
         {
-            "name": "Default cuts", # for legend
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/btagCutsOnly/jetROC_TC_btagCutsOnly.root",
-            "color": ROOT.kBlue,
+            "name": "Loosened cuts + MVA>#cutvalue",
+            "wps": [ 
+                { "idx": 14, "val": -0.2, "col": ROOT.kMagenta+1 },
+                { "idx": 18, "val": -0.11, "col": ROOT.kGreen+1 },
+                { "idx": 30, "val": -0.05, "col": ROOT.kOrange },
+                { "idx": 40, "val": 0.0, "col": ROOT.kRed },
+            ],
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_loosenedbTagCuts_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC.root",
         },
         {
-            "name": "Loosened cuts", # for legend
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/loosenedbtagCutsOnly/jetROC_TC_loosenedbtagCutsOnly.root",
-            "color": ROOT.kRed,
-        },
-        {
-            "name": "MVA>-0.444",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0444.root",
-            "color": ROOT.kMagenta+1,
-        },
-        {
-            "name": "MVA>-0.440",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0440.root",
-            "color": ROOT.kGreen+1,
-        },
-        {
-            "name": "MVA>-0.434",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0434.root",
-            "color": ROOT.kOrange,
-        },
-        {
-            "name": "MVA>-0.430",
-            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/BDT_trackFromBjetvsOther_dZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC_BDT_CUT-0430.root",
-            "color": ROOT.kRed,
-        },
+            "name": "Default cuts",
+            "wps": [ 
+                { "idx": 0, "col": ROOT.kBlue }
+            ],
+            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/btagCutsOnly/jetROC_TC.root",
+        }
     ]
+
+#cuts = [
+#        {
+#            "name": "Default cuts + MVA>#cutvalue",
+#            "wps": [ 
+#                { "idx": 0, "val": -0.3, "col": ROOT.kMagenta+1 },
+#                { "idx": 20, "val": -0.2, "col": ROOT.kGreen+1 },
+#                { "idx": 40, "val": -0.1, "col": ROOT.kOrange },
+#                { "idx": 70, "val": 0.05, "col": ROOT.kRed },
+#            ],
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/BDT_bTagCuts_LogdZ_length_dist_IP2D_pt_chi2_nHitPix_nHitAll/jetROC_TC.root",
+#        },
+#        {
+#            "name": "Default cuts",
+#            "wps": [ 
+#                { "idx": 0, "col": ROOT.kBlue }
+#            ],
+#            "file": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/btagCutsOnly/jetROC_TC.root",
+#        }
+#    ]
 
 discriminants = [
         {
@@ -226,8 +111,8 @@ discriminants = [
 
 # General configuration
 runCfg = {
-        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDT_trackFromBjetvsOther/performances.root",
-        "printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks/comp_btagCutsOnly_BDT_trackFromBjetvsOther/plots", # optional
+        "outFile": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/comp_default_vs_BDTloosenedCuts.root",
+        #"printDir": "/home/fynu/swertz/CMS_tasks/BTagTrackSel/myTrees/rejFakeTracks_manyMVA/plots", # optional
         "formats": ["png"], # optional
         "batch": True, # optional
         }
@@ -241,18 +126,25 @@ for discr in discriminants:
 
         myGraphs = []
         for cut in cuts:
-            graphCfg = {   
-                    "file": cut["file"],
-                    "key": flav["key"] + "/" + discr["key"],
-                    "name": cut["name"],
-                    "color": cut["color"],
-                    "style": drawStyle,
-                    "markerStyle": markerStyle, # Only used if "P" in "style" (default 20)
-                    "markerSize": markerSize, # (default 1)
-                    "lineStyle": lineStyle, # Only used if "L" in "style" (default 1)
-                    "lineWidth": lineWidth, # (default 1)
-                }
-            myGraphs.append(graphCfg)
+            for wp in cut["wps"]:
+                graphCfg = {   
+                        "file": cut["file"],
+                        "key": flav["key"] + "/" + discr["key"],
+                        # Following two options only when the Graph is retrieved from a list of graphs in the file
+                        "isFromTList": True,
+                        "idx": wp["idx"],
+                        "color": wp["col"],
+                        "style": drawStyle,
+                        "markerStyle": markerStyle, # Only used if "P" in "style" (default 20)
+                        "markerSize": markerSize, # (default 1)
+                        "lineStyle": lineStyle, # Only used if "L" in "style" (default 1)
+                        "lineWidth": lineWidth, # (default 1)
+                    }
+                try:
+                    graphCfg["name"] = cut["name"].replace("#cutvalue", str(wp["val"]))
+                except KeyError:
+                    graphCfg["name"] = cut["name"]
+                myGraphs.append(graphCfg)
 
         myCanvas = {
                 "name": discr["filename"] + "_" + flav["filename"], # Name of the canvas for the output ROOT/png/... files

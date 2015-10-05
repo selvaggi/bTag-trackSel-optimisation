@@ -10,13 +10,19 @@ import warnings
 # See https://root.cern.ch/phpBB3/viewtopic.php?f=14&t=14213
 warnings.filterwarnings(action='ignore', category=RuntimeWarning, message='creating converter.*')
 
+# Needed to use many TTreeFormulae on a TChain
+# See https://sft.its.cern.ch/jira/browse/ROOT-7677
+ROOT.gInterpreter.ProcessLine("#include \"tools/Formulas.h\"")
+
 class trackCutSelector:
     """ Using the BTagAnalyzer tree and track number, check whether track passes cuts or not. """
 
-    def __init__(self, tree, cuts):
+    def __init__(self, tree, formulaManager, cuts):
         self.cuts = cuts
+        self.formulaManager = formulaManager
         self.formula = ROOT.TTreeFormula("Cut_formula", cuts, tree)
-        tree.SetNotify(self.formula)
+        self.formulaManager.Add(self.formula)
+        tree.SetNotify(self.formulaManager)
 
     def evaluate(self, tree, trackN):
         # Important otherwise the vector is not loaded correctly
@@ -26,10 +32,11 @@ class trackCutSelector:
 class trackMVASelector:
     """ Using the BTagAnalyzer tree and track number, check whether track is selected by MVA or not. """
     
-    def __init__(self, tree, path, name, cut, trackVars):
+    def __init__(self, tree, formulaManager, path, name, cuts, trackVars):
         self.name = name
         self.path = path
-        self.cut = cut
+        self.formulaManager = formulaManager
+        self.cuts = cuts
         self.reader = ROOT.TMVA.Reader()
         
         # We cannot use a dict to hold the variables since TMVA cares about the order of the variables
@@ -39,7 +46,8 @@ class trackMVASelector:
         
         self.trackVarFormulas = { name: ROOT.TTreeFormula(name, name, tree) for name in trackVars }
         for formula in self.trackVarFormulas.values():
-            tree.SetNotify(formula)
+            self.formulaManager.Add(formula)
+        tree.SetNotify(formulaManager)
         
         self.reader.BookMVA(self.name, self.path)
 
@@ -53,178 +61,308 @@ class trackMVASelector:
         return self.reader.EvaluateMVA(self.name)
 
     def evaluate(self, tree, trackN):
-        return self.getValue(tree, trackN) > self.cut
+        results = []
+        mvaValue = self.getValue(tree, trackN) 
+        return [ mvaValue > cut for cut in self.cuts ]
 
 
 
-def createJetTreeTC(rootFiles, treeDirectory, outFileName, trackCut=None, trackMVA=None):
+def createJetTreeTC(inputFileList, treeDirectory, outFileName, trackCut=None, trackMVA=None):
     """ Create TTree containing info about the jets.
     The tracks in the jets are selected either using cuts, or a MVA, or both.
     Only jets with at least one track are kept.
-    For each jet, the number of selected tracks, and the jet IPsig, TCHE, and TCHP values are stored."""
+    For each jet, the number of selected tracks, and the jet IPsig, TCHE, and TCHP values are stored as vectors (one entry per cut on the MVA)."""
 
     tree = ROOT.TChain(treeDirectory)
-    for file in rootFiles:
-        if not os.path.isfile(file):
-            print "Error: file {} does not exist.".format(file)
-            sys.exit(1)
+    for file in inputFileList:
         tree.Add(file)
 
     outFile = ROOT.TFile(outFileName, "recreate")
     outTree = ROOT.TTree("jetTree", "jetTree")
 
     # The variables that are simply copied from the input tree
-    copiedVariablesToStore = ["Jet_genpt", "Jet_pt", "Jet_ntracks", "Jet_eta", "Jet_phi", "Jet_flavour"]
-    copiedVariables = { name: array("d", [0]) for name in copiedVariablesToStore }
-
-    # The variables that we compute here and store in the output tree
-    outVariablesToStore = ["Jet_nseltracks", "Jet_Ip", "TCHE", "TCHP"]
-    outVariables = { name: array("d", [0]) for name in outVariablesToStore }
+    copiedVariablesFloatToStore = ["Jet_genpt", "Jet_pt", "Jet_eta", "Jet_phi"]
+    copiedVariablesIntToStore = ["Jet_ntracks", "Jet_flavour"]
     
-    for name, var in copiedVariables.items() + outVariables.items():
+    copiedVariablesFloat = { name: array("d", [0]) for name in copiedVariablesFloatToStore }
+    for name, var in copiedVariablesFloat.items():
         outTree.Branch(name, var, name + "/D")
+    copiedVariablesInt = { name: array("i", [0]) for name in copiedVariablesIntToStore }
+    for name, var in copiedVariablesInt.items():
+        outTree.Branch(name, var, name + "/I")
 
+    copiedVariables = dict( copiedVariablesFloat, **copiedVariablesInt )
+    
+    # The variables that we compute here and store in the output tree
+    outVariablesIntToStore = ["Jet_nseltracks"]
+    outVariablesFloatToStore = ["Jet_Ip", "TCHE", "TCHP"]
+    outVariables = dict( { name: ROOT.std.vector(float)() for name in outVariablesFloatToStore }, **{ name: ROOT.std.vector(int)() for name in outVariablesIntToStore } )
+    
+    for name, var in outVariables.items():
+        outTree.Branch(name, var)
+
+    print ""
+
+    formulaManager = ROOT.Formulas()
+    
+    nCuts = 1
     # Create a trackCutSelector to select tracks using cuts
     myTrackCutSel = None
     if trackCut is not None:
-        myTrackCutSel = trackCutSelector(tree, trackCut)
+        print "Will use base rectangular cuts: {}".format(trackCut)
+        myTrackCutSel = trackCutSelector(tree, formulaManager, trackCut)
 
     # Create a trackMVASelector to select tracks using the MVA output
     myTrackMVASel = None
     if trackMVA is not None:
         if not os.path.isfile(trackMVA["path"]):
-            print "Error: file {} does not exist.".format(trackMVA["path"])
-            sys.exit(1)
-        myTrackMVASel = trackMVASelector(tree, trackMVA["path"], trackMVA["name"], trackMVA["cut"], trackMVA["vars"])
+            raise Exception("Error: file {} does not exist.".format(trackMVA["path"]))
+        print "Will use MVA-based track selector {} on cut values {}.\n".format(trackMVA["name"], trackMVA["cuts"])
+        myTrackMVASel = trackMVASelector(tree, formulaManager, trackMVA["path"], trackMVA["name"], trackMVA["cuts"], trackMVA["vars"])
+        nCuts = len(trackMVA["cuts"])
 
+    print ""
+    
     nEntries = tree.GetEntries()
     print "Will loop over ", nEntries, " events."
 
-    nSelTracksB = 0
-    nTotTracksB = 0
-    nSelTracksPU = 0
-    nTotTracksPU = 0
-    
+    nSelTracksB     = [0]*nCuts
+    nTotTracksB     = 0
+    nSelTracksLight = [0]*nCuts
+    nTotTracksLight = 0
+    nSelTracksC     = [0]*nCuts
+    nTotTracksC     = 0
+    nSelTracksPU    = [0]*nCuts
+    nTotTracksPU    = 0
+
     # Looping over events
     for entry in xrange(nEntries):
         if (entry+1) % 1000 == 0:
             print "Event {}.".format(entry+1)
         tree.GetEntry(entry)
-
+            
         # Looping over jets
         for jetInd in xrange(tree.nJet):
-
-            selTracks = []
+            selTracks = [ [] for i in xrange(nCuts) ]
 
             # Looping over tracks
             for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
-                if abs(tree.Jet_flavour[jetInd]) == 5 and tree.Jet_genpt[jetInd] >= 8:
-                    nTotTracksB += 1
-                if tree.Jet_genpt[jetInd] < 8:
+                if tree.Jet_genpt[jetInd] >= 8:
+                    if abs(tree.Jet_flavour[jetInd]) == 5:
+                        nTotTracksB += 1
+                    if abs(tree.Jet_flavour[jetInd]) == 4:
+                        nTotTracksC += 1
+                    if abs(tree.Jet_flavour[jetInd]) < 4 or tree.Jet_flavour[jetInd] == 21:
+                        nTotTracksLight += 1
+                else:
                     nTotTracksPU += 1
-                keepTrack = True
+                
+                keepTrack = [ True for i in xrange(nCuts) ]
 
                 if myTrackCutSel is not None:
-                    keepTrack = keepTrack and myTrackCutSel.evaluate(tree, track)
-                if not keepTrack: continue
+                    cutResult = myTrackCutSel.evaluate(tree, track)
+                    keepTrack = [ x and cutResult for x in keepTrack ]
+                if not any(keepTrack): continue
 
                 if myTrackMVASel is not None:
-                    keepTrack = keepTrack and myTrackMVASel.evaluate(tree, track)
-                if not keepTrack: continue
+                    keepTrack = [ x and y for (x,y) in zip(keepTrack, myTrackMVASel.evaluate(tree, track)) ]
+                if not any(keepTrack): continue
 
-                if abs(tree.Jet_flavour[jetInd]) == 5 and tree.Jet_genpt[jetInd] >= 8:
-                    nSelTracksB += 1
-                if tree.Jet_genpt[jetInd] < 8:
-                    nSelTracksPU += 1
-                # For selected tracks, store pair (track number, IPsig)
-                selTracks.append( (track, tree.Track_IPsig[track]) )
+                for i in xrange(nCuts):
+                    if keepTrack[i]:
+                        if tree.Jet_genpt[jetInd] >= 8:
+                            if abs(tree.Jet_flavour[jetInd]) == 5:
+                                nSelTracksB[i] += 1
+                            if abs(tree.Jet_flavour[jetInd]) == 4:
+                                nSelTracksC[i] += 1
+                            if abs(tree.Jet_flavour[jetInd]) < 4 or tree.Jet_flavour[jetInd] == 21:
+                                nSelTracksLight[i] += 1
+                        else:
+                            nSelTracksPU[i] += 1
+                
+                        # For selected tracks, store pair (track number, IPsig)
+                        selTracks[i].append( (track, tree.Track_IPsig[track]) )
 
-            if len(selTracks) == 0: continue
+            selectedJet = False
+            for i in xrange(nCuts):
+                if len(selTracks[i]):
+                    selectedJet = True
 
-            outVariables["Jet_nseltracks"][0] = len(selTracks)
+                    outVariables["Jet_nseltracks"].push_back(len(selTracks[i]))
 
-            # Sort tracks according to decreasing IP significance
-            sorted(selTracks, reverse = True, key = lambda track: track[1])
+                    # Sort tracks according to decreasing IP significance
+                    selTracks[i].sort(reverse = True, key = lambda track: track[1])
 
-            # TCHE = IPsig of 2nd track, TCHP = IPsig of 3rd track (default to -10**10)
-            outVariables["Jet_Ip"][0] = selTracks[0][1]
-            outVariables["TCHE"][0] = -10**10
-            outVariables["TCHP"][0] = -10**10
-            if len(selTracks) > 1:
-                outVariables["TCHE"][0] = selTracks[1][1]
-            if len(selTracks) > 2:
-                outVariables["TCHP"][0] = selTracks[2][1]
+                    # TCHE = IPsig of 2nd track, TCHP = IPsig of 3rd track (default to -10**10)
+                    outVariables["Jet_Ip"].push_back(selTracks[i][0][1])
+                    outVariables["TCHE"].push_back(-10**10)
+                    outVariables["TCHP"].push_back(-10**10)
+                    if len(selTracks[i]) > 1:
+                        outVariables["TCHE"][i] = selTracks[i][1][1]
+                    if len(selTracks[i]) > 2:
+                        outVariables["TCHP"][i] = selTracks[i][2][1]
+            
+            if selectedJet:
+                # Get value of the variables we simply copy
+                for name, var in copiedVariables.items():
+                    var[0] = tree.__getattr__(name)[jetInd]
 
-            # Get value of the variables we simply copy
-            for name, var in copiedVariables.items():
-                var[0] = tree.__getattr__(name)[jetInd]
+                outTree.Fill()
 
-            outTree.Fill()
+            for var in outVariables.values():
+                var.clear()
 
-    print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB, nTotTracksB, float(100*nSelTracksB)/nTotTracksB)
-    print "PU track efficiency: {}/{} = {}%.".format(nSelTracksPU, nTotTracksPU, float(100*nSelTracksPU)/nTotTracksPU)
+    print ""
+
+    for i in xrange(nCuts):
+        if trackMVA is not None:
+            print "MVA cut value {}:".format(trackMVA["cuts"][i])
+        else:
+            print "Non-MVA cuts:"
+        if nTotTracksB != 0: print "B track efficiency:  {}/{} = {}%.".format(nSelTracksB[i], nTotTracksB, float(100*nSelTracksB[i])/nTotTracksB)
+        if nTotTracksC != 0: print "C track efficiency:  {}/{} = {}%.".format(nSelTracksC[i], nTotTracksC, float(100*nSelTracksC[i])/nTotTracksC)
+        if nTotTracksLight != 0: print "Light track efficiency:  {}/{} = {}%.".format(nSelTracksLight[i], nTotTracksB, float(100*nSelTracksLight[i])/nTotTracksLight)
+        if nTotTracksPU != 0: print "PU track efficiency: {}/{} = {}%.\n".format(nSelTracksPU[i], nTotTracksPU, float(100*nSelTracksPU[i])/nTotTracksPU)
 
     outFile.cd()
     outTree.Write()
     outFile.Close()
 
 
-def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetCutList):
+def createDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetCategList):
     """ Using the tree output by createJetTreeTC, create histograms of the variables defined in histList.
-    A separate histogram is created on the jet of jets defined by each cut in jetCutList.
+    A separate histogram is created on the set of jets defined by each cut in jetCategList.
     The histograms are then saved in outputFileName, in different folders. """
 
     tree = ROOT.TChain(treeDirectory)
     for file in inputFileList:
-        if not os.path.isfile(file):
-            print "Error: file {} does not exist.".format(file)
-            sys.exit(1)
         tree.Add(file)
 
     outFile = ROOT.TFile(outputFileName, "recreate")
 
-    # Define the cut selection formulae
-    for cut in jetCutList:
-        cut["formula"] = ROOT.TTreeFormula(cut["name"], cut["cuts"], tree)
-        tree.SetNotify(cut["formula"])
-        outFile.mkdir(cut["name"])
-        cut["total"] = 0 # keep track of the total number of entries for each jet category
+    # Define the jet category selection formulae
+    myFormulaManager = ROOT.Formulas()
+    for cat in jetCategList:
+        cat["formula"] = ROOT.TTreeFormula(cat["name"], cat["cuts"], tree)
+        myFormulaManager.Add(cat["formula"])
+        outFile.mkdir(cat["name"])
+        cat["total"] = 0 # keep track of the total number of entries for each jet category
+    tree.SetNotify(myFormulaManager)
 
     # For each histogram of histList, and for each cut of jetCutList, define a TH1
     for histDict in histList:
-        histDict["cutDict"] = { cut["name"]: ROOT.TH1D(cut["name"] + "_" + histDict["name"], histDict["title"], histDict["bins"], histDict["range"][0], histDict["range"][1]) for cut in jetCutList }
+        histDict["categDict"] = { cat["name"]: ROOT.TH1D(cat["name"] + "_" + histDict["name"], histDict["title"], histDict["bins"], histDict["range"][0], histDict["range"][1]) for cat in jetCategList }
 
     # Loop on the jets and fill histograms
     for entry in xrange(tree.GetEntries()):
         tree.GetEntry(entry)
-        for cut in jetCutList:
-            if cut["formula"].EvalInstance():
-                cut["total"] += 1
+        for cat in jetCategList:
+            if cat["formula"].EvalInstance():
+                cat["total"] += 1
                 for histDict in histList:
                     value = tree.__getattr__(histDict["var"])
                     # We don't want to include the under/overflow:
                     if value >= histDict["range"][0] and value < histDict["range"][1]:
-                        histDict["cutDict"][ cut["name"] ].Fill(value)
+                        histDict["categDict"][ cat["name"] ].Fill(value)
 
-    for cut in jetCutList:
-        print "Total number of entries for category {}: {}.".format(cut["name"], cut["total"]) 
+    for cat in jetCategList:
+        print "Total number of entries for category {}: {}.".format(cat["name"], cat["total"]) 
 
     # Write histograms to output file
-    for cut in jetCutList:
-        outFile.cd(cut["name"])
+    for cat in jetCategList:
+        outFile.cd(cat["name"])
         for histDict in histList:
-            histDict["cutDict"][ cut["name"] ].Write(histDict["name"])
+            histDict["categDict"][ cat["name"] ].Write(histDict["name"])
 
     # For those who asked it, create TGraph of eff. vs. cut value:
-    for cut in jetCutList:
-        outFile.cd(cut["name"])
+    for cat in jetCategList:
+        outFile.cd(cat["name"])
 
         for histDict in histList:
             if "discreff" in histDict.keys():
                 if histDict["discreff"] is True:
-                    myGraph = drawEffVsCutCurve(myTH1 = histDict["cutDict"][ cut["name"] ], total = cut["total"])
+                    myGraph = drawEffVsCutCurve(myTH1 = histDict["categDict"][ cut["name"] ], total = cat["total"])
                     myGraph.Write(histDict["name"] + "_graph")
 
+    outFile.Close()
+
+
+def create2DDiscrHist(inputFileList, treeDirectory, outputFileName, histList, jetCategList, mvaCutList = [0]):
+    """ Using the tree output by createJetTreeTC, create histograms of the variables defined in histList.
+    A separate histogram is created on the set of jets defined by each cut in jetCategList.
+    The y-direction of the histogram corresponds to different cut values on the MVA.
+    The histograms are then saved in outputFileName, in different folders. """
+
+    tree = ROOT.TChain(treeDirectory)
+    for file in inputFileList:
+        tree.Add(file)
+
+    outFile = ROOT.TFile(outputFileName, "recreate")
+
+    # Define the jet category selection formulae
+    myFormulaManager = ROOT.Formulas()
+    for cat in jetCategList:
+        cat["formula"] = ROOT.TTreeFormula(cat["name"], cat["cuts"], tree)
+        myFormulaManager.Add(cat["formula"])
+        outFile.mkdir(cat["name"])
+        cat["total"] = 0 # keep track of the total number of entries for each jet category
+    tree.SetNotify(myFormulaManager)
+    nCuts = len(mvaCutList)
+
+    # For each histogram of histList, and for each cut of jetCutList, define a TH2
+    # The y-axis of the TH2 corresponds to the different cut values on the MVA
+    for histDict in histList:
+        histDict["categDict"] = { cat["name"]: ROOT.TH2D(cat["name"] + "_" + histDict["name"], histDict["title"], histDict["bins"], histDict["range"][0], histDict["range"][1], nCuts, 0, nCuts) for cat in jetCategList }
+
+    # Loop on the jets and fill histograms
+    for entry in xrange(tree.GetEntries()):
+        tree.GetEntry(entry)
+        for cat in jetCategList:
+            if cat["formula"].EvalInstance():
+                cat["total"] += 1
+                for histDict in histList:
+                    value = tree.__getattr__(histDict["var"])
+                    try:
+                        if len(value) >= 1:
+                            for mvaCut in xrange( len(value) ):
+                                # We don't want to include the under/overflow:
+                                #if value[mvaCut] >= histDict["range"][0] and value[mvaCut] < histDict["range"][1]:
+                                histDict["categDict"][ cat["name"] ].Fill(value[mvaCut], mvaCut)
+                    except TypeError:
+                        for mvaCut in xrange(nCuts):
+                            # We don't want to include the under/overflow:
+                            #if value >= histDict["range"][0] and value < histDict["range"][1]:
+                            histDict["categDict"][ cat["name"] ].Fill(value, mvaCut)
+
+    for cat in jetCategList:
+        print "Total number of entries for category {}: {}.".format(cat["name"], cat["total"]) 
+
+    # Write histograms to output file
+    for cat in jetCategList:
+        outFile.cd(cat["name"])
+        for histDict in histList:
+            histDict["categDict"][ cat["name"] ].Write(histDict["name"])
+
+    # For those who asked it, create TGraphAsymmErrors of eff. vs. cut value for each cut on the MVA:
+    for cat in jetCategList:
+        outFile.cd(cat["name"])
+
+        for histDict in histList:
+            if "discreff" in histDict.keys():
+                if histDict["discreff"] is True:
+                    
+                    myList = ROOT.TList()
+                    
+                    for i in range(nCuts):
+                        myEffGraph = createEfficiency( histDict["categDict"][ cat["name"] ].ProjectionX(histDict["name"]+"_projX"+str(i), i+1, i+1) ).CreateGraph()
+                        # For those who asked it, store each graph separately (for easier viewing in a TBrowser)
+                        if "effgraph" in histDict.keys():
+                            if histDict["effgraph"] is True:
+                                myEffGraph.Write( histDict["name"] + "_graph_" + str(i) )
+                        myList.Add(myEffGraph)
+                    
+                    myList.Write(histDict["name"] + "_graphs", ROOT.TObject.kSingleKey)
+    
     outFile.Close()
 
 
@@ -252,28 +390,55 @@ def drawEffVsCutCurve(myTH1, total = 0):
     
     return ROOT.TGraph(len(discrV), np.array(discrV), np.array(effV))
 
+def createEfficiency(myTH1):
+    """ Create TEfficiency object based on the discriminant in myTH1:
+    Efficiency in bin i is #entries(bins >= i)/#total entries. 
+    Under- and overflow are taken into account. """
 
-def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants):
+    total = myTH1.Integral(0, myTH1.GetXaxis().GetNbins()+1)
+
+    totTH1 = ROOT.TH1D( myTH1.Clone("total") )
+    passTH1 = ROOT.TH1D( myTH1.Clone("passed") )
+    for i in range(totTH1.GetXaxis().GetNbins()+2):
+        totTH1.SetBinContent(i, total)
+        passTH1.SetBinContent(i, myTH1.Integral(i, totTH1.GetXaxis().GetNbins()+1))
+
+    myEff = ROOT.TEfficiency(passTH1, totTH1)
+    myEff.SetStatisticOption(ROOT.TEfficiency.kFCP)
+
+    return myEff
+
+
+def createROCfromEffVsCutCurves(inFile, outFile, sigCat, bkgCats, discriminants, writeGraphs=False):
     """ Draw ROC curves from TGraphs (stored in inFile) of efficiency vs. discriminant cut value,
     created by the function createDiscrHist().
     Store the curves in outFile. """
 
     inputFile = ROOT.TFile(inFile, "read")
 
-    sigGraphs = { discri: inputFile.Get(sigCat + "/" + discri + "_graph") for discri in discriminants }
-    bkgGraphDict = {}
+    sigGraphList = { discri: inputFile.Get(sigCat + "/" + discri + "_graphs") for discri in discriminants }
+    bkgGraphListDict = {}
     for bkg in bkgCats:
-        bkgGraphDict[bkg] = { discri: inputFile.Get(bkg + "/" + discri + "_graph") for discri in discriminants }
+        bkgGraphListDict[bkg] = { discri: inputFile.Get(bkg + "/" + discri + "_graphs") for discri in discriminants }
 
     outputFile = ROOT.TFile(outFile, "recreate")
 
-    for bkg, graphs in bkgGraphDict.items():
+    for bkg, bkgGraphList in bkgGraphListDict.items():
         outputFile.mkdir(sigCat + "_vs_" + bkg)
         outputFile.cd(sigCat + "_vs_" + bkg)
 
         for discri in discriminants:
-            myROC = drawROCfromEffVsCutCurves(sigGraphs[discri], graphs[discri])
-            myROC.Write(discri)
+            myList = ROOT.TList()
+            
+            for i in range(bkgGraphList[discri].GetEntries()):
+                bkgGraph = bkgGraphList[discri].At(i)
+                sigGraph = sigGraphList[discri].At(i)
+                myROC = drawROCfromEffVsCutCurves(sigGraph, bkgGraph)
+                myList.Add(myROC)
+                if writeGraphs:
+                    myROC.Write(discri + "_{}".format(i))
+            
+            myList.Write(discri, ROOT.TObject.kSingleKey)
 
     inputFile.Close()
     outputFile.Close()
@@ -293,7 +458,11 @@ def drawROCfromEffVsCutCurves(sigGraph, bkgGraph):
         sys.exit(1)
 
     sigEff = []
+    sigEffErrXLow = []
+    sigEffErrXUp = []
     bkgEff = []
+    bkgEffErrYLow = []
+    bkgEffErrYUp = []
 
     for i in range(nPoints):
         sigValX = ROOT.Double()
@@ -305,7 +474,92 @@ def drawROCfromEffVsCutCurves(sigGraph, bkgGraph):
         bkgGraph.GetPoint(i, bkgValX, bkgValY)
 
         sigEff.append(sigValY)
-        bkgEff.append(bkgValY)
+        sigEffErrXLow.append(sigGraph.GetErrorXlow(i))
+        sigEffErrXUp.append(sigGraph.GetErrorXhigh(i))
 
-    return ROOT.TGraph(nPoints, np.array(sigEff), np.array(bkgEff))
+        bkgEff.append(bkgValY)
+        bkgEffErrYLow.append(bkgGraph.GetErrorYlow(i))
+        bkgEffErrYUp.append(bkgGraph.GetErrorYhigh(i))
+
+    return ROOT.TGraphAsymmErrors(nPoints, np.array(sigEff), np.array(bkgEff), np.array(sigEffErrXLow), np.array(sigEffErrXUp), np.array(bkgEffErrYLow), np.array(bkgEffErrYUp))
+
+
+def createMVAPerfsFromROCCurves(inFile, outFile, sigCat, bkgCats, discriminants, workingPoints, mvaCuts):
+    """ Create a set of graphs of "cut on MVA" vs. "Tagger signal efficiency" for a given tagger background rejection (workingPoints) """
+    
+    inputFile = ROOT.TFile(inFile, "read")
+
+    outputFile = ROOT.TFile(outFile, "recreate")
+
+    for bkg in bkgCats:
+        outputFile.mkdir(sigCat + "_vs_" + bkg)
+        outputFile.cd(sigCat + "_vs_" + bkg)
+        
+        for discri in discriminants:
+            for wp, wpRej in workingPoints.items():
+                ROCList = inputFile.Get(sigCat + "_vs_" + bkg + "/" + discri)
+                perfCurve = drawPerfCurveFromROCList(ROCList, wpRej, mvaCuts)
+                perfCurve.Write(discri + "_" + wp)
+
+    outputFile.Close()
+    inputFile.Close()
+
+
+def drawPerfCurveFromROCList(ROCList, wpRej, cuts):
+    """ Draw a graph of "cut on MVA" vs. "Tagger signal efficiency" for a given tagger background rejection (wpRej) """
+
+    nROC = ROCList.GetEntries()
+    if nROC != len(cuts):
+        raise Exception("Error: number of cuts does not correspond to number of ROCs!")
+
+    effList = []
+    effListErrUp = []
+    effListErrLow = []
+
+    for i in range(nROC):
+        thisROC = ROCList.At(i)
+        nPoints = thisROC.GetN()
+       
+        foundPoint = False
+
+        for j in range(nPoints):
+            
+            sigEff = ROOT.Double()
+            bkgEff = ROOT.Double()
+            thisROC.GetPoint(j, sigEff, bkgEff)
+
+            if j == 0 and bkgEff <= wpRej:
+                # If the first point on the ROC curve is already below the working point, we cannot do anything
+                break
+            
+            sigEffPrev = ROOT.Double(0)
+            bkgEffPrev = ROOT.Double(0)
+            if j >= 1:
+                thisROC.GetPoint(j-1, sigEffPrev, bkgEffPrev)
+            
+            if bkgEff <= wpRej:
+                # We have crossed the working point => do a linear interpolation between this point and the previous one to find the correct signal efficiency value
+                
+                if bkgEff == wpRej:
+                    effList.append(sigEff)
+                    effListErrLow.append(thisROC.GetErrorXlow(j))
+                    effListErrUp.append(thisROC.GetErrorXhigh(j))
+                    foundPoint = True
+                    break
+                
+                elif sigEffPrev != 0 and sigEffPrev != sigEff and bkgEffPrev != bkgEff:
+                    slope = (bkgEffPrev-bkgEff)/(sigEffPrev-sigEff)
+                    correctSigEff = (wpRej-bkgEff)/slope + sigEff
+                    effList.append(correctSigEff)
+                    effListErrLow.append( ( (correctSigEff-sigEff)*thisROC.GetErrorXlow(j-1) + (sigEffPrev-correctSigEff)*thisROC.GetErrorXlow(j) ) / (sigEffPrev-sigEff) )
+                    effListErrUp.append( ( (correctSigEff-sigEff)*thisROC.GetErrorXhigh(j-1) + (sigEffPrev-correctSigEff)*thisROC.GetErrorXhigh(j) ) / (sigEffPrev-sigEff) )
+                    foundPoint = True
+                    break
+
+        if not foundPoint:
+            effList.append(0)
+            effListErrLow.append(0)
+            effListErrUp.append(0)
+
+    return ROOT.TGraphAsymmErrors(nROC, np.array(cuts), np.array(effList), np.zeros(len(cuts)), np.zeros(len(cuts)), np.array(effListErrLow), np.array(effListErrUp))
 
