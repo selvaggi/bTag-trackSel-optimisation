@@ -6,7 +6,7 @@ storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-3
 rootFileNames = ["JetTree_phys14_1.root"]
 treeDirectory = "btagana/ttree"
 doPTreweight = True
-outRootFileName = "trackParametersComparison_QCD3050Muen_bJet_vs_jetPTlower8_noTrackSel.root"
+outRootFileName ="test.root"   #"trackParametersComparison_QCD3050Muen_bJet_vs_jetPTlower8_noTrackSel.root"
 
 TrackVars = { 
 
@@ -27,7 +27,8 @@ TrackVars = {
     "Track_nHitPixel": { "name": "Track_nHitPixel", "title": "Track_nHitPixel", "bin": 10, "xmin": 0, "xmax": 10 }, 
     "Track_nHitAll": { "name": "Track_nHitAll", "title": "Track_nHitAll", "bin": 35, "xmin": 0, "xmax": 35 }, 
     "Track_category": { "name": "Track_category", "title": "Track_category", "bin": 12, "xmin": -2, "xmax": 10 }, 
-    "Track_PV": { "name": "Track_PV", "title": "Track_PV", "bin": 16, "xmin": -1, "xmax": 15 }
+    "Track_PV": { "name": "Track_PV", "title": "Track_PV", "bin": 16, "xmin": -1, "xmax": 15 },
+    "Track_PVweight": { "name": "Track_PVweight", "title": "Track_PVweight", "bin": 500, "xmin": -1, "xmax": 2 }
     
  }
 

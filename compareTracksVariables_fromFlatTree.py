@@ -4,22 +4,22 @@ import os
 
 gROOT.SetBatch()
 
-absolutePath = "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation"
-patternDirectory = absolutePath + "/SIGTrackTree_SELTrackSel.root"
-trackSelection = "bTag_zIP_abs"
+absolutePath = "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/"
+patternDirectory = absolutePath + "SIGTrackTree_track_hist_BfrombVSFake_SELTrackSel.root"  #"SIGTrackTree_track_hist_trackFromBVStrackNonbJet_SELTrackSel.root" #"/SIGTrackTree_SELTrackSel.root"
+trackSelection = "noBIS"   #"bTag_zIP_abs"
 sample1 = "sig"
 sample2 = "bkg"  # will be in red
 treeName = "trackTree"
-doPTreweight = True
+doPTreweight = False
 
 File1 = patternDirectory.replace("SIG",sample1).replace("SEL",trackSelection)
 File2 = patternDirectory.replace("SIG",sample2).replace("SEL",trackSelection)
 
 yAxisLabel = "Arbitrary Scale"
-leftText = "Tracks from PU vs tracks from b-jets, #sqrt{s}=13 TeV"
+leftText = "QCD Pt 15-30 recodebug, Asympt50ns, #sqrt{s}=13 TeV"
 rightText = ""
 format = "png"
-outputDirectory = "./bkgTrackvsSigTrack_"+trackSelection+"TrackSel/"
+outputDirectory = "./BfrombVSFake_"+trackSelection+"TrackSel/" #"./trackFromBVStrackNonbJet_"+trackSelection+"TrackSel/"  #"./BfrombVSFake_"+trackSelection+"TrackSel/"
 outFile = outputDirectory+"/compare_"+sample1+"_"+sample2+"_trackVariables"+trackSelection+"TrackSel.root"
 
 if not os.path.exists(outputDirectory) :
@@ -29,7 +29,7 @@ VarsNoSel = {
 
     "Track_dxy":{"name":"Track_dxy","title":"Track_dxy","bin":2000,"xmin":-0.5,"xmax":0.5},
     "Track_dz":{"name":"Track_dz","title":"Track_dz","bin":2000,"xmin":-50,"xmax":50},
-    "Track_zIP":{"name":"Track_zIP","title":"Track_zIP","bin":1000,"xmin":-30,"xmax":30},
+    #"Track_zIP":{"name":"Track_zIP","title":"Track_zIP","bin":1000,"xmin":-30,"xmax":30},
     "Track_length":{"name":"Track_length","title":"Track_length","bin":1000,"xmin":-1,"xmax":6},
     "Track_dist":{"name":"Track_dist","title":"Track_dist","bin":1000,"xmin":-0.3,"xmax":0.01},
     "Track_IP2D":{"name":"Track_IP2D","title":"Track_IP2D","bin":2000,"xmin":-0.5,"xmax":0.5},
@@ -52,7 +52,7 @@ VarsbTagSel = {
 
     "Track_dxy":{"name":"Track_dxy","title":"Track_dxy","bin":200,"xmin":-0.5,"xmax":0.5},
     "Track_dz":{"name":"Track_dz","title":"Track_dz","bin":200,"xmin":-50,"xmax":50},
-    "Track_zIP":{"name":"Track_zIP","title":"Track_zIP","bin":100,"xmin":-30,"xmax":30},
+    #"Track_zIP":{"name":"Track_zIP","title":"Track_zIP","bin":100,"xmin":-30,"xmax":30},
     "Track_length":{"name":"Track_length","title":"Track_length","bin":100,"xmin":-1,"xmax":6},
     "Track_dist":{"name":"Track_dist","title":"Track_dist","bin":100,"xmin":-0.06,"xmax":0.01},
     "Track_IP2D":{"name":"Track_IP2D","title":"Track_IP2D","bin":200,"xmin":-0.5,"xmax":0.5},
@@ -111,8 +111,8 @@ for var in Vars.keys() :
         print dict_histo1[var].Integral()
         print dict_histo2[var].Integral()
     leg = TLegend(0.61,0.64,0.86,0.89)
-    leg.AddEntry(dict_histo1[var],"b-jet Tracks")
-    leg.AddEntry(dict_histo2[var],"PU Tracks")
+    leg.AddEntry(dict_histo1[var],"B hadron Track")
+    leg.AddEntry(dict_histo2[var],"Fake Track")
     leg.SetFillColor(0)
     leg.SetLineColor(0)
 
