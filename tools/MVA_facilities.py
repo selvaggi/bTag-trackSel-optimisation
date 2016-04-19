@@ -26,15 +26,15 @@ def train_MVA(bkgTree, sigTree, discriList, MVAmethod,label):
     for discriVar in discriList :
         factory.AddVariable(discriVar)
 
-    factory.AddBackgroundTree(tree_proc1, proc1_weight)
     factory.AddSignalTree(tree_proc2, proc2_weight)
+    factory.AddBackgroundTree(tree_proc1, proc1_weight)
 
     if MVAmethod == "BDT" :
         method = factory.BookMethod(ROOT.TMVA.Types.kBDT, "800_"+label, "!H:!V:NTrees=800")
     elif MVAmethod == "MLP" :
         method = factory.BookMethod(ROOT.TMVA.Types.kMLP, "N_Nmin1_"+label, "H:V:VarTransform=Norm:NCycles=3000:HiddenLayers=N,N-1:TestRate=10")
     elif MVAmethod == "CUT" :
-        method = factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "")  #"!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
+        method = factory.BookMethod(ROOT.TMVA.Types.kCuts, "MC_"+label, "!H:!V:FitMethod=MC:EffSel:SampleSize=8000000:VarProp=FSmart")
     elif MVAmethod == "ALL" :
         factory.BookMethod(ROOT.TMVA.Types.kBDT, "800_"+label, "!H:!V:NTrees=800")
         factory.BookMethod(ROOT.TMVA.Types.kMLP, "N_Nmin1_"+label, "H:V:VarTransform=Norm:NCycles=3000:HiddenLayers=N,N-1:TestRate=10")
