@@ -208,6 +208,7 @@ def createTreeSigBkg(rootFiles, treeDirectory, trackVariablesToStore, outRootFil
             if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
                 for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
                     nSigTrack_beforeSel += 1
+
                     #track_4v = ROOT.TLorentzVector()
                     #track_4v.SetPtEtaPhiE(tree.Track_pt[track], tree.Track_eta[track], tree.Track_phi[track], 0)# tree.Track_p[track])
                     #jetTrack_DR = track_4v.DeltaR(jet_4v)
@@ -346,9 +347,10 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     bkgTree.Write()
     trackEff_hist_bkg.Write()
     outFile_bkg.Close()
+    print "% of BWeakDecay ", trackHistList.count(1)/float(len(trackHistList))
+    print "% of Fake ", trackHistList.count(10000000)/float(len(trackHistList))
+    print "% of PU ", trackHistList.count(1000000000)/float(len(trackHistList))
     print outRootFileName_bkg, "written."
-    #print "% of BWeakDecay ", trackHistList.count(1)/float(len(trackHistList))
-    #print "% of Fake ", trackHistList.count(10000000)/float(len(trackHistList))
     #print "% of Nothing ", trackHistList.count(0)/float(len(trackHistList))
     #print "Mean ", len(trackHistList)/float(sum(trackHistList))
     #print "Track PV 0 " , trackPVList.count(0)/float(len(trackPVList))

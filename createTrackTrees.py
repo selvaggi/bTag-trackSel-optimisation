@@ -1,8 +1,9 @@
 from tools.crabOutAnalyzer import *
 import os
 
-storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
-rootFileNames = ["JetTree_phys14_1.root"]
+#storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
+storeDirectory = "~/CMSSW_7_6_5/src/RecoBTag/PerformanceMeasurements/test"
+rootFileNames = ["JetTree_mc.root"]
 treeDirectory = "btagana/ttree"
 doPTreweight = True
 trackSelection = "bTag_zIP_abs"    #"bTagLoosened", "no", "dist", "bTag"
@@ -13,7 +14,7 @@ TrackVars = {
 
     "Track_dxy":{"name":"Track_dxy","title":"Track_dxy","bin":2000,"xmin":-0.5,"xmax":0.5},
     "Track_dz":{"name":"Track_dz","title":"Track_dz","bin":2000,"xmin":-50,"xmax":50},
-    "Track_zIP":{"name":"Track_zIP","title":"Track_zIP","bin":1000,"xmin":-30,"xmax":30},
+#    "Track_zIP":{"name":"Track_zIP","title":"Track_zIP","bin":1000,"xmin":-30,"xmax":30},
     "Track_length":{"name":"Track_length","title":"Track_length","bin":1000,"xmin":0,"xmax":60},
     "Track_dist":{"name":"Track_dist","title":"Track_dist","bin":2000,"xmin":-4,"xmax":1},
     "Track_IP2D":{"name":"Track_IP2D","title":"Track_IP2D","bin":2000,"xmin":-0.5,"xmax":0.5},
@@ -35,3 +36,4 @@ TrackVars = {
 if __name__ == "__main__" :
     fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
     createTreeSigBkg(fileList, treeDirectory, TrackVars.keys(), outFileSig, outFileBkg)
+    createTreeSigBkg_trackHist(fileList, treeDirectory, TrackVars.keys(), outFileSig, outFileBkg)
