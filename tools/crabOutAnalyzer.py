@@ -8,15 +8,21 @@ import math
 def isSelectedTrack(HitPix=2, HitAll=8, IP2D=0.2, Pt=1, Chi2=5, dz=17, Length=5, Dist=0.07):  #default values are the value requested for selectedTrack in bTag code
     return HitPix >= 2 and HitAll >= 8 and abs(IP2D) < 0.2 and Pt > 1 and Chi2 < 5 and abs(dz) < 17 and Length < 5 and abs(Dist) < 0.07  # bTag current selection
     #return HitPix >= 0 and HitAll >= 0 and abs(IP2D) < 0.2 and Pt > 0 and Chi2 < 5 and abs(dz) < 17 and Length < 5 and abs(Dist) < 0.07  # Looser selection
-    #return HitPix >= 1 and HitAll >= 6 and abs(IP2D) < 0.3 and Pt>0.5 and Chi2 < 7 and abs(zIP) < 20 and Length <6 and Dist < 0.1 # Looser selection
+    #return HitPix >= 1 and HitAll >= 6 and abs(IP2D) < 0.2 and Pt > 0.5 and Chi2 < 5 and abs(dz) < 10 and Length < 5 and Dist < 0.07 # Looser selection
     #return Dist < 0.07    # Selection applied only on the "Jet vs track" variable
     #return True # no selection 
 
 def isSignalJet(jetGenPT, jetFlavour):
     return jetGenPT>8 and abs(jetFlavour)==5
     
+    
+    
 def isBkgJet(jetGenPT, jetFlavour):
     return jetGenPT<8 
+
+def isNonBJet(jetGenPT, jetFlavour):
+    return jetGenPT>8 and abs(jetFlavour)!=5
+
 
 def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight, outRootFileName):
     
@@ -264,7 +270,7 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     nSigTrack_beforeSel = 0
     nSigTrack_afterSel = 0
     nTrack_beforeFakeCriteria = 0
-    nBkgTrack_beforeSel = 0
+    nPuTrack_beforeSel = 0
     nBkgTrack_afterSel = 0
     nTrackAfterSel_bJet = 0
     nBtrackAfterSel_bJet = 0
@@ -272,7 +278,16 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     nTrackAfterSel_nonBjet = 0
     nBtrackBeforeSel_bJet = 0
     nFakeTrack_nonBjet = 0
+    nFakeTrack_beforeSel = 0
 
+    nBkgTrack_beforeSel = 0
+    nBtrackBeforeSel_NonBJet = 0
+    nPuTrack_beforeSel_NonBJet = 0
+    nBkgTrack_beforeSel_NonBJet = 0
+    nFakeTrack_beforeSel_NonBJet = 0
+   
+    nBjets = 0
+   
     nEntries = tree.GetEntries()
     print "Will loop over ", nEntries, " events."
     
@@ -281,58 +296,73 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     for entry in xrange(nEntries):
         tree.GetEntry(entry)
         for jetInd in xrange(tree.nJet):
-          #if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
-          #if isBkgJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]):
-
-            #jet_4v = ROOT.TLorentzVector()
-            #jet_4v.SetPtEtaPhiM(tree.Jet_pt[jetInd], tree.Jet_eta[jetInd], tree.Jet_phi[jetInd], 0) # tree.Jet_mass[jetInd])
-            for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
-             #if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_dz[track], tree.Track_length[track], tree.Track_dist[track]):
-                trackHist = tree.Track_history[track]
-                stringTrackHist = str(trackHist)
-                trackHistList.append(trackHist)
-                trackPVList.append(tree.Track_PV[track])
-
-                #track_4v = ROOT.TLorentzVector()
-                #track_4v.SetPtEtaPhiE(tree.Track_pt[track], tree.Track_eta[track], tree.Track_phi[track], 0)# tree.Track_p[track])
-                #jetTrack_DR = track_4v.DeltaR(jet_4v)
-                if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
+        
+	    if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
+	        nBjets += 1
+	  
+	    for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
+                  trackHist = tree.Track_history[track]
+                  stringTrackHist = str(trackHist)
+                  trackHistList.append(trackHist)
+                  trackPVList.append(tree.Track_PV[track])
+                
+		#if not isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_dz[track], tree.Track_length[track], tree.Track_dist[track]):
+              
+	          if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
                     nSigTrack_beforeSel += 1
-                    if (stringTrackHist[len(stringTrackHist)-1] == str(1)) :
-                    #if trackHist == 1 :
-                        #nBtrackBeforeSel_bJet += 1
-                        #if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_dz[track], tree.Track_length[track], tree.Track_dist[track]):
-                            #nTrackAfterSel_bJet += 1
-                            #nTrack_beforeBcriteria += 1 
+                  
+		    # is coming from B weak decay and is signal
+		    if (stringTrackHist[len(stringTrackHist)-1] == str(1) and stringTrackHist[len(stringTrackHist)-10] == str(1)) :
                             nBtrackAfterSel_bJet += 1
-                            #nSigTrack_beforeSel += 1
-                            #nSigTrack_afterSel += 1
+                            nBtrackBeforeSel_bJet += 1
                             for variable in dict_variableName_Leaves.keys() :
                                 dict_variableName_Leaves[variable][0] = getattr(tree, variable)[track]
                             sigTree.Fill()
-                else : 
-                    #nTrack_beforeFakeCriteria += 1
-                    nBkgTrack_beforeSel += 1
-                    if trackHist >= 10000000 and trackHist < 100000000 :
-                        #nFakeTrack_nonBjet += 1
-                        #if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_dz[track], tree.Track_length[track], tree.Track_dist[track]):
-                        #nBkgTrack_beforeSel += 1
-                            #nTrackAfterSel_nonBjet += 1
-                            nFakeAfterSel_nonBjet += 1
-                            #nBkgTrack_afterSel += 1
-                            for variable in dict_variableName_Leaves.keys() :
-                                dict_variableName_Leaves[variable][0] = getattr(tree, variable)[track]
-                            bkgTree.Fill()
+                    
+		    # is fake or pu
+	            elif trackHist < 1e9 :
+		       for variable in dict_variableName_Leaves.keys() :
+                           dict_variableName_Leaves[variable][0] = getattr(tree, variable)[track]
+                       bkgTree.Fill()
+           
+		       # is fake 
+	               if (len(stringTrackHist)>=8 and stringTrackHist[len(stringTrackHist)-8] == str(1)) :
+		         nFakeTrack_beforeSel += 1
+                     
+		       # is pu
+		       else: 
+                          nPuTrack_beforeSel += 1
+                
+		   
+		  elif isNonBJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
+		     nBkgTrack_beforeSel_NonBJet += 1
+                   
+		     # is coming from B weak decay and is signal
+		     if (stringTrackHist[len(stringTrackHist)-1] == str(1) and stringTrackHist[len(stringTrackHist)-10] == str(1)) :
+                         nBtrackBeforeSel_NonBJet +=1
+	            
+		     # is non-signal and non-fake (i.e is pile-up)  
+		     elif trackHist < 1e9 :
+		        # is fake 
+			if (len(stringTrackHist)>=8 and stringTrackHist[len(stringTrackHist)-8] == str(1)) :
+		           nFakeTrack_beforeSel_NonBJet += 1
+		        # is pu
+		        else: 
+                           nPuTrack_beforeSel_NonBJet += 1
+			   
    
-    #print "Signal:     {} track selection efficiency.".format(nSigTrack_afterSel/float(nSigTrack_beforeSel))
-    #print "Percentage of B track in b jet (gen pt >8) : {} ".format(nBtrackBeforeSel_bJet/float(nSigTrack_beforeSel))
-    #print "Percentage of B track kept after selection : {} ".format(nBtrackAfterSel_bJet/float(nBtrackBeforeSel_bJet))
-    #print "Percentage of bkg track kept after selection : {} ".format(nBkgTrack_afterSel/float(nBkgTrack_beforeSel))
-    #print "Background: {} track selection efficiency.".format(nBkgTrack_afterSel/float(nBkgTrack_beforeSel))
-    #print "Percentage of fake track in !(b jet && gen pt >8) after sel : {} ".format(nFakeAfterSel_nonBjet/float(nTrackAfterSel_nonBjet))
-    #print "Percentage of fake track in !(b jet && gen pt >8) : {} ".format(nFakeTrack_nonBjet/float(nBkgTrack_beforeSel))
-    #print "Percentage of fake track in !(b jet && gen pt >8) kept after selection : {} ".format(nFakeAfterSel_nonBjet/float(nFakeTrack_nonBjet))
-
+    print "Average number of B track per b jet (gen pt >8) : {} ".format(round(nBtrackBeforeSel_bJet/float(nBjets),2))
+    print "Average number of Pu track per b jet (gen pt >8) : {} ".format(round(nPuTrack_beforeSel/float(nBjets),2))
+    print "Average number of fake track per b jet (gen pt >8) : {} ".format(round(nFakeTrack_beforeSel/float(nBjets),2))
+      
+    print "Percentage of B track in b jet (gen pt >8) : {} ".format(round(100*nBtrackBeforeSel_bJet/float(nSigTrack_beforeSel),2))
+    print "Percentage of Pu track in (b jet && gen pt >8) : {} ".format(round(100*nPuTrack_beforeSel/float(nSigTrack_beforeSel),2))
+    print "Percentage of Fake track in (b jet && gen pt >8) : {} ".format(round(100*nFakeTrack_beforeSel/float(nSigTrack_beforeSel),2))
+    
+    print "Percentage of B track in non b jet (gen pt >8) : {} ".format(round(100*nBtrackBeforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+    print "Percentage of Pu track in non b jet (gen pt >8) : {} ".format(round(100*nPuTrack_beforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+    print "Percentage of Fake track in non b jet (gen pt >8): {} ".format(round(100*nFakeTrack_beforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+     
     trackEff_hist_sig = ROOT.TH1D("trackEff_hist_sig", "trackEff_hist", 100, 0, 1)
     #trackEff_hist_sig.Fill(nSigTrack_afterSel/float(nSigTrack_beforeSel))
     outFile_sig = ROOT.TFile(outRootFileName_sig, "recreate")
@@ -347,9 +377,13 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     bkgTree.Write()
     trackEff_hist_bkg.Write()
     outFile_bkg.Close()
-    print "% of BWeakDecay ", trackHistList.count(1)/float(len(trackHistList))
+    print "% of BWeakDecay ", trackHistList.count(1e9+1)/float(len(trackHistList))
+    print "% of CWeakDecay ", trackHistList.count(1e9+10)/float(len(trackHistList))
+    print "% of BCWeakDecay ", trackHistList.count(1e9+11)/float(len(trackHistList))
+    
+    print "% of Signal ", trackHistList.count(1e9)/float(len(trackHistList))
     print "% of Fake ", trackHistList.count(10000000)/float(len(trackHistList))
-    print "% of PU ", trackHistList.count(1000000000)/float(len(trackHistList))
+
     print outRootFileName_bkg, "written."
     #print "% of Nothing ", trackHistList.count(0)/float(len(trackHistList))
     #print "Mean ", len(trackHistList)/float(sum(trackHistList))
