@@ -14,15 +14,15 @@ def isSelectedTrack(HitPix=2, HitAll=8, IP2D=0.2, Pt=1, Chi2=5, dz=17, Length=5,
 
 def isSignalJet(jetGenPT, jetFlavour):
     return jetGenPT>8 and abs(jetFlavour)==5
-    
-    
-    
+     
 def isBkgJet(jetGenPT, jetFlavour):
     return jetGenPT<8 
 
 def isNonBJet(jetGenPT, jetFlavour):
     return jetGenPT>8 and abs(jetFlavour)!=5
 
+def isLightJet(jetGenPT, jetFlavour):
+    return jetGenPT>8 and abs(jetFlavour)!=5 and abs(jetFlavour)!=4
 
 def plotFromCrabOut(rootFiles, treeDirectory, TrackVars, JetVars,  doPTreweight, outRootFileName):
     
@@ -279,14 +279,16 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     nBtrackBeforeSel_bJet = 0
     nFakeTrack_nonBjet = 0
     nFakeTrack_beforeSel = 0
-
+    nCtrackBeforeSel_bJet = 0
     nBkgTrack_beforeSel = 0
     nBtrackBeforeSel_NonBJet = 0
     nPuTrack_beforeSel_NonBJet = 0
     nBkgTrack_beforeSel_NonBJet = 0
     nFakeTrack_beforeSel_NonBJet = 0
+    nCtrackBeforeSel_NonBJet = 0
    
     nBjets = 0
+    nLjets = 0
    
     nEntries = tree.GetEntries()
     print "Will loop over ", nEntries, " events."
@@ -300,20 +302,26 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
 	    if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
 	        nBjets += 1
 	  
+	    if isLightJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
+	        nLjets += 1
+	  
 	    for track in xrange(tree.Jet_nFirstTrack[jetInd], tree.Jet_nLastTrack[jetInd]):
-                  trackHist = tree.Track_history[track]
-                  stringTrackHist = str(trackHist)
-                  trackHistList.append(trackHist)
-                  trackPVList.append(tree.Track_PV[track])
+                trackHist = tree.Track_history[track]
+                stringTrackHist = str(trackHist)
+                trackHistList.append(trackHist)
+                trackPVList.append(tree.Track_PV[track])
                 
-		#if not isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_dz[track], tree.Track_length[track], tree.Track_dist[track]):
+		if isSelectedTrack(tree.Track_nHitPixel[track], tree.Track_nHitAll[track], tree.Track_IP2D[track], tree.Track_pt[track], tree.Track_chi2[track], tree.Track_dz[track], tree.Track_length[track], tree.Track_dist[track]):
               
 	          if isSignalJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
                     nSigTrack_beforeSel += 1
                   
+		    # is coming from C weak decay, not B and  is signal
+		    if (stringTrackHist[len(stringTrackHist)-2] == str(1) and stringTrackHist[len(stringTrackHist)-10] == str(1) and stringTrackHist[len(stringTrackHist)-1] == str(0) ) :
+		            nCtrackBeforeSel_bJet += 1
+		   
 		    # is coming from B weak decay and is signal
 		    if (stringTrackHist[len(stringTrackHist)-1] == str(1) and stringTrackHist[len(stringTrackHist)-10] == str(1)) :
-                            nBtrackAfterSel_bJet += 1
                             nBtrackBeforeSel_bJet += 1
                             for variable in dict_variableName_Leaves.keys() :
                                 dict_variableName_Leaves[variable][0] = getattr(tree, variable)[track]
@@ -334,9 +342,13 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
                           nPuTrack_beforeSel += 1
                 
 		   
-		  elif isNonBJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
+		  elif isLightJet(tree.Jet_genpt[jetInd], tree.Jet_flavour[jetInd]) :
 		     nBkgTrack_beforeSel_NonBJet += 1
-                   
+                 
+		     # is coming from C weak decay, not B and  is signal
+		     if (stringTrackHist[len(stringTrackHist)-2] == str(1) and stringTrackHist[len(stringTrackHist)-10] == str(1) and stringTrackHist[len(stringTrackHist)-1] == str(0) ) :
+		         nCtrackBeforeSel_NonBJet += 1
+		 
 		     # is coming from B weak decay and is signal
 		     if (stringTrackHist[len(stringTrackHist)-1] == str(1) and stringTrackHist[len(stringTrackHist)-10] == str(1)) :
                          nBtrackBeforeSel_NonBJet +=1
@@ -354,15 +366,25 @@ def createTreeSigBkg_trackHist(rootFiles, treeDirectory, trackVariablesToStore, 
     print "Average number of B track per b jet (gen pt >8) : {} ".format(round(nBtrackBeforeSel_bJet/float(nBjets),2))
     print "Average number of Pu track per b jet (gen pt >8) : {} ".format(round(nPuTrack_beforeSel/float(nBjets),2))
     print "Average number of fake track per b jet (gen pt >8) : {} ".format(round(nFakeTrack_beforeSel/float(nBjets),2))
-      
+       
     print "Percentage of B track in b jet (gen pt >8) : {} ".format(round(100*nBtrackBeforeSel_bJet/float(nSigTrack_beforeSel),2))
     print "Percentage of Pu track in (b jet && gen pt >8) : {} ".format(round(100*nPuTrack_beforeSel/float(nSigTrack_beforeSel),2))
     print "Percentage of Fake track in (b jet && gen pt >8) : {} ".format(round(100*nFakeTrack_beforeSel/float(nSigTrack_beforeSel),2))
-    
-    print "Percentage of B track in non b jet (gen pt >8) : {} ".format(round(100*nBtrackBeforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
-    print "Percentage of Pu track in non b jet (gen pt >8) : {} ".format(round(100*nPuTrack_beforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
-    print "Percentage of Fake track in non b jet (gen pt >8): {} ".format(round(100*nFakeTrack_beforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+   
+    print "Average number of B track per light jet (gen pt >8) : {} ".format(round(nBtrackBeforeSel_NonBJet/float(nLjets),2))
+    print "Average number of Pu track per light jet (gen pt >8) : {} ".format(round(nPuTrack_beforeSel_NonBJet/float(nLjets),2))
+    print "Average number of fake track per light jet (gen pt >8) : {} ".format(round(nFakeTrack_beforeSel_NonBJet/float(nLjets),2))
      
+    print "Percentage of B track in light jet (gen pt >8) : {} ".format(round(100*nBtrackBeforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+    print "Percentage of Pu track in light jet (gen pt >8) : {} ".format(round(100*nPuTrack_beforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+    print "Percentage of Fake track in light jet (gen pt >8): {} ".format(round(100*nFakeTrack_beforeSel_NonBJet/float(nBkgTrack_beforeSel_NonBJet),2))
+     
+    ## produce latex table
+    
+    #print "B decay & " , format(round(nBtrackBeforeSel_bJet/float(nBjets),2)) , "(" , format(round(100*nBtrackBeforeSel_bJet/float(nSigTrack_beforeSel),2))
+    
+    
+    
     trackEff_hist_sig = ROOT.TH1D("trackEff_hist_sig", "trackEff_hist", 100, 0, 1)
     #trackEff_hist_sig.Fill(nSigTrack_afterSel/float(nSigTrack_beforeSel))
     outFile_sig = ROOT.TFile(outRootFileName_sig, "recreate")
