@@ -12,11 +12,14 @@ sample2 = "bkg"  # will be in red
 treeName = "trackTree"
 doPTreweight = False
 
-File1 = patternDirectory.replace("SIG",sample1).replace("SEL",trackSelection)
-File2 = patternDirectory.replace("SIG",sample2).replace("SEL",trackSelection)
+#File1 = patternDirectory.replace("SIG",sample1).replace("SEL",trackSelection)
+#File2 = patternDirectory.replace("SIG",sample2).replace("SEL",trackSelection)
+
+File1 = "sigTrackTree_bTag_zIP_absTrackSel.root"
+File2 = "bkgTrackTree_bTag_zIP_absTrackSel.root"
 
 yAxisLabel = "Arbitrary Scale"
-leftText = "QCD Pt 15-30 recodebug, Asympt50ns, #sqrt{s}=13 TeV"
+leftText = "QCD Pt 50-80 recodebug, Asympt25ns, #sqrt{s}=13 TeV"
 rightText = ""
 format = "png"
 outputDirectory = "./BfrombVSFake_"+trackSelection+"TrackSel/" #"./trackFromBVStrackNonbJet_"+trackSelection+"TrackSel/"  #"./BfrombVSFake_"+trackSelection+"TrackSel/"
@@ -107,12 +110,12 @@ for var in Vars.keys() :
         dict_histo1[var].Scale(1./float(dict_histo1[var].Integral()))
         dict_histo2[var].Scale(1./float(dict_histo2[var].Integral()))
     except ZeroDivisionError :
-        print "Can not renormalize because of intergal = 0." 
+        print "Can not renormalize because of integral = 0." 
         print dict_histo1[var].Integral()
         print dict_histo2[var].Integral()
     leg = TLegend(0.61,0.64,0.86,0.89)
-    leg.AddEntry(dict_histo1[var],"B hadron Track")
-    leg.AddEntry(dict_histo2[var],"Fake Track")
+    leg.AddEntry(dict_histo1[var],"B hadron tracks")
+    leg.AddEntry(dict_histo2[var],"Fake + PU tracks")
     leg.SetFillColor(0)
     leg.SetLineColor(0)
 
