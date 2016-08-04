@@ -1,14 +1,15 @@
 from tools.crabOutAnalyzer import *
 import os
 
-#storeDirectory = "/storage/data/cms/store/user/brfranco/bTag/QCD_Phys14/QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_PionKaonDecay_Tune4C_13TeV_pythia8/150306_172100/0000/"
-storeDirectory = "~/CMSSW_7_6_5/src/RecoBTag/PerformanceMeasurements/test"
-rootFileNames = ["JetTree_mc.root"]
+storeDirectory = "/storage/data/cms/store/user/ajmerten/bTag/TT_TuneCUETP8M1_13TeV-powheg-pythia8/crab_TT_TuneCUETP8M1_13TeV-powheg-pythia8_2016-07-26_1469538272670/160726_130513/0000/"
+
+rootFileNames = ["JetTree_mc_1*.root"]
 treeDirectory = "btagana/ttree"
 doPTreweight = True
 trackSelection = "bTag_zIP_abs"    #"bTagLoosened", "no", "dist", "bTag"
-outFileSig = "sigTrackTree_"+trackSelection+"TrackSel.root"
-outFileBkg = "bkgTrackTree_"+trackSelection+"TrackSel.root"
+trackSelection ="nosel"
+outFileSig = "sigTrackTree_"+trackSelection+"_TTbar.root"
+outFileBkg = "bkgTrackTree_"+trackSelection+"_TTbar.root"
 
 TrackVars = {
 
@@ -35,5 +36,5 @@ TrackVars = {
 
 if __name__ == "__main__" :
     fileList = [ os.path.join(storeDirectory, file) for file in rootFileNames ]
-    createTreeSigBkg(fileList, treeDirectory, TrackVars.keys(), outFileSig, outFileBkg)
+  #  createTreeSigBkg(fileList, treeDirectory, TrackVars.keys(), outFileSig, outFileBkg)
     createTreeSigBkg_trackHist(fileList, treeDirectory, TrackVars.keys(), outFileSig, outFileBkg)
