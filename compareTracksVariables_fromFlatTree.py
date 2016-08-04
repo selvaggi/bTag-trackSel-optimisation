@@ -6,7 +6,8 @@ gROOT.SetBatch()
 
 absolutePath = "/home/fynu/bfrancois/MyCMSSWcode/bTag/bTag_track_optimisation/"
 patternDirectory = absolutePath + "SIGTrackTree_track_hist_BfrombVSFake_SELTrackSel.root"  #"SIGTrackTree_track_hist_trackFromBVStrackNonbJet_SELTrackSel.root" #"/SIGTrackTree_SELTrackSel.root"
-trackSelection = "noBIS"   #"bTag_zIP_abs"
+#trackSelection = "noBIS   #"bTag_zIP_abs"
+trackSelection = "invsel"
 sample1 = "sig"
 sample2 = "bkg"  # will be in red
 treeName = "trackTree"
@@ -15,8 +16,10 @@ doPTreweight = False
 #File1 = patternDirectory.replace("SIG",sample1).replace("SEL",trackSelection)
 #File2 = patternDirectory.replace("SIG",sample2).replace("SEL",trackSelection)
 
-File1 = "sigTrackTree_bTag_zIP_absTrackSel.root"
-File2 = "bkgTrackTree_bTag_zIP_absTrackSel.root"
+#File1 = "sigTrackTree_bTag_zIP_absTrackSel.root"
+File1 = "sigTrackTree_invselTrackSel.root"
+#File2 = "bkgTrackTree_bTag_zIP_absTrackSel.root"
+File2 = "bkgTrackTree_invselTrackSel.root"
 
 yAxisLabel = "Arbitrary Scale"
 leftText = "QCD Pt 50-80 recodebug, Asympt25ns, #sqrt{s}=13 TeV"
@@ -117,8 +120,8 @@ for var in Vars.keys() :
     leg.AddEntry(dict_histo1[var],"B hadron tracks")
     leg.AddEntry(dict_histo2[var],"Fake + PU tracks")
     leg.SetFillColor(0)
+    leg.SetFillStyle(0)
     leg.SetLineColor(0)
-
 
     drawDoublehisto(dict_histo1[var],dict_histo2[var],var,var,yAxisLabel,leg,leftText,rightText,format,outputDirectory,0)
     drawDoublehisto(dict_histo1[var],dict_histo2[var],var,var,yAxisLabel,leg,leftText,rightText,format,outputDirectory,1)
